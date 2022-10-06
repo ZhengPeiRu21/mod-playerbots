@@ -153,7 +153,7 @@ AiPlayerbot.AutoLearnQuestSpells = 0
 
 # Random Bots will pick quests on their own and try to complete
 # Default: 0 (disabled)
-AiPlayerbot.AutoDoQuests = 0
+AiPlayerbot.AutoDoQuests = 1
 
 ##################################################################################
 #                                                                                #
@@ -447,32 +447,32 @@ AiPlayerbot.IterationsPerTick = 100
 AiPlayerbot.AllowGuildBots = 1
 
 # Delay between two short-time spells cast
-AiPlayerbot.GlobalCooldown = 1500
+AiPlayerbot.GlobalCooldown = 150
 
 # Max wait time when moving
-AiPlayerbot.MaxWaitForMove = 5000
+AiPlayerbot.MaxWaitForMove = 500
 
 # Action expiration time
-AiPlayerbot.ExpireActionTime = 5000
+AiPlayerbot.ExpireActionTime = 500
 
 # Max dispel auras duration
-AiPlayerbot.DispelAuraDuration = 7000
+AiPlayerbot.DispelAuraDuration = 700
 
 # Delay between two bot actions
-AiPlayerbot.ReactDelay = 500
+AiPlayerbot.ReactDelay = 50
 
 # Inactivity delay
-AiPlayerbot.PassiveDelay = 10000
+AiPlayerbot.PassiveDelay = 50
 
 # Minimum delay between repeating actions (chat messages, emotes etc)
-AiPlayerbot.RepeatDelay = 5000
+AiPlayerbot.RepeatDelay = 8000
 
 # Delay timers
-AiPlayerbot.ErrorDelay = 5000
-AiPlayerbot.RpgDelay = 10000
-AiPlayerbot.SitDelay = 30000
-AiPlayerbot.ReturnDelay = 7000
-AiPlayerbot.LootDelay = 1000
+AiPlayerbot.ErrorDelay = 50
+AiPlayerbot.RpgDelay = 10
+AiPlayerbot.SitDelay = 30
+AiPlayerbot.ReturnDelay = 70
+AiPlayerbot.LootDelay = 10
 
 # Distances
 AiPlayerbot.FarDistance = 20.0
@@ -511,22 +511,22 @@ AiPlayerbot.CombatStrategies = "+custom::say"
 AiPlayerbot.NonCombatStrategies = "+custom::say,+return"
 
 # How often tasks are changed
-AiPlayerbot.MinGuildTaskChangeTime = 172800
-AiPlayerbot.MaxGuildTaskChangeTime = 432000
+AiPlayerbot.MinGuildTaskChangeTime = 17280
+AiPlayerbot.MaxGuildTaskChangeTime = 43200
 
 # Mail spam interval
-AiPlayerbot.MinGuildTaskAdvertisementTime = 300
-AiPlayerbot.MaxGuildTaskAdvertisementTime = 43200
+AiPlayerbot.MinGuildTaskAdvertisementTime = 30
+AiPlayerbot.MaxGuildTaskAdvertisementTime = 4320
 
 # Delay before reward is sent
-AiPlayerbot.MinGuildTaskRewardTime = 300
-AiPlayerbot.MaxGuildTaskRewardTime = 3600
+AiPlayerbot.MinGuildTaskRewardTime = 30
+AiPlayerbot.MaxGuildTaskRewardTime = 360
 
 # Cleanup of guild tasks interval
 AiPlayerbot.GuildTaskAdvertCleanupTime = 300
 
 # Specify max distance between victim and bot when creating guild kill task
-AiPlayerbot.GuildTaskKillTaskDistance = 2000
+AiPlayerbot.GuildTaskKillTaskDistance = 200
 
 # Distance margin for facade calculations
 AiPlayerbot.TargetPosRecalcDistance = 0.1
@@ -535,13 +535,13 @@ AiPlayerbot.TargetPosRecalcDistance = 0.1
 AiPlayerbot.RandomBotMaps = 0,1,530,571
 
 # Quest items to leave (do not destroy)
-AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000""
+AiPlayerbot.RandomBotQuestItems = "6948,5175,5176,5177,5178,16309,12382,13704,11000"
 
 # PvP Restricted Zones (bots don't pvp)
-AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323""
+AiPlayerbot.PvpProhibitedZoneIds = "2255,656,2361,2362,2363,976,35,2268,3425,392,541,1446,3828,3712,3738,3565,3539,3623,4152,3988,4658,4284,4418,4436,4275,4323,4395"
 
 # Spells every random bot will learn on randomize (54197 - cold weather flying)
-AiPlayerbot.RandomBotSpellIds = "54197""
+AiPlayerbot.RandomBotSpellIds = "54197"
 
 # Level diff between random bots and nearby creatures for random teleports
 AiPlayerbot.RandomBotTeleLevel = 5
@@ -560,8 +560,8 @@ AiPlayerbot.MaxRandomRandomizeTime = 1209600
 AiPlayerbot.RandomBotsPerInterval = 60
 AiPlayerbot.MinRandomBotsPriceChangeInterval = 7200
 AiPlayerbot.MaxRandomBotsPriceChangeInterval = 172800
-AiPlayerbot.MinRandomBotChangeStrategyTime = 1800
-AiPlayerbot.MaxRandomBotChangeStrategyTime = 7200
+AiPlayerbot.MinRandomBotChangeStrategyTime = 180
+AiPlayerbot.MaxRandomBotChangeStrategyTime = 720
 AiPlayerbot.MinRandomBotReviveTime = 60
 AiPlayerbot.MaxRandomBotReviveTime = 300
 

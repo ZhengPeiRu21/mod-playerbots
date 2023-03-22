@@ -981,7 +981,7 @@ bool MovementAction::ChaseTo(WorldObject* obj, float distance, float angle)
 
     UpdateMovementState();
 
-    if (bot->IsSitState())
+    if (!bot->IsStandState())
         bot->SetStandState(UNIT_STAND_STATE_STAND);
 
     if (bot->IsNonMeleeSpellCast(true))
@@ -1081,17 +1081,6 @@ bool MovementAction::Flee(Unit *target)
             {
                 foundFlee = MoveNear(master);
             }
-
-            if (foundFlee)
-            {
-                if (!urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
-                {
-                    std::vector<uint32> sounds;
-                    sounds.push_back(304); // guard
-                    sounds.push_back(306); // flee
-                    botAI->PlayEmote(sounds[urand(0, sounds.size() - 1)]);
-                }
-            }
         }
     }
     else // bot is not targeted, try to flee dps/healers
@@ -1166,16 +1155,6 @@ bool MovementAction::Flee(Unit *target)
                     foundFlee = MoveNear(master);
             }
 
-            if (foundFlee)
-            {
-                if (!urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
-                {
-                    std::vector<uint32> sounds;
-                    sounds.push_back(304); // guard
-                    sounds.push_back(306); // flee
-                    botAI->PlayEmote(sounds[urand(0, sounds.size() - 1)]);
-                }
-            }
         }
     }
 
@@ -1208,13 +1187,6 @@ bool MovementAction::Flee(Unit *target)
     }
 
     bool result = MoveTo(target->GetMapId(), rx, ry, rz);
-    if (result && !urand(0, 50) && botAI->HasStrategy("emote", BOT_STATE_NON_COMBAT))
-    {
-        std::vector<uint32> sounds;
-        sounds.push_back(304); // guard
-        sounds.push_back(306); // flee
-        botAI->PlayEmote(sounds[urand(0, sounds.size() - 1)]);
-    }
 
     if (result)
         AI_VALUE(LastMovement&, "last movement").lastFlee = time(nullptr);
@@ -1316,11 +1288,13 @@ bool SetBehindTargetAction::Execute(Event event)
 
     float angle = GetFollowAngle() / 3 + target->GetOrientation() + M_PI;
 
+    //return ChaseTo(target, 0.f, angle);
+
     float distance = sPlayerbotAIConfig->contactDistance;
     float x = target->GetPositionX() + cos(angle) * distance;
     float y = target->GetPositionY() + sin(angle) * distance;
     float z = target->GetPositionZ();
-    //bot->UpdateGroundPositionZ(x, y, z);
+    bot->UpdateGroundPositionZ(x, y, z);
 
     return MoveTo(bot->GetMapId(), x, y, z);
 }

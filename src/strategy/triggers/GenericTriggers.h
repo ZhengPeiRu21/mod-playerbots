@@ -5,6 +5,8 @@
 #ifndef _PLAYERBOT_GENERICTRIGGERS_H
 #define _PLAYERBOT_GENERICTRIGGERS_H
 
+#include <utility>
+
 #include "RangeTriggers.h"
 #include "HealthTriggers.h"
 
@@ -133,6 +135,14 @@ class SpellCanBeCastTrigger : public SpellTrigger
 		bool IsActive() override;
 };
 
+class SpellNoCooldownTrigger : public SpellTrigger
+{
+    public:
+        SpellNoCooldownTrigger(PlayerbotAI* botAI, std::string const spell) : SpellTrigger(botAI, spell) {}
+
+         bool IsActive() override;
+};
+
 // TODO: check other targets
 class InterruptSpellTrigger : public SpellTrigger
 {
@@ -233,11 +243,14 @@ class HighAoeTrigger : public AoeTrigger
 class BuffTrigger : public SpellTrigger
 {
     public:
-        BuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1) : SpellTrigger(botAI, spell, checkInterval) { }
+        BuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false) : SpellTrigger(botAI, spell, checkInterval) { this->checkIsOwner = checkIsOwner; }
 
     public:
 		std::string const GetTargetName() override { return "self target"; }
         bool IsActive() override;
+
+    protected:
+        bool checkIsOwner;
 };
 
 class BuffOnPartyTrigger : public BuffTrigger
@@ -293,7 +306,7 @@ class TargetInSightTrigger : public Trigger
 class DebuffTrigger : public BuffTrigger
 {
     public:
-        DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1) : BuffTrigger(botAI, spell, checkInterval) { }
+        DebuffTrigger(PlayerbotAI* botAI, std::string const spell, int32 checkInterval = 1, bool checkIsOwner = false) : BuffTrigger(botAI, spell, checkInterval, checkIsOwner) { }
 
 		std::string const GetTargetName() override { return "current target"; }
         bool IsActive() override;
@@ -347,6 +360,21 @@ class AndTrigger : public Trigger
     protected:
         Trigger* ls;
         Trigger* rs;
+};
+
+class TwoTriggers : public Trigger
+{
+    public:
+        explicit TwoTriggers(PlayerbotAI* botAI, std::string name1 = "", std::string name2 = "") : Trigger(botAI)
+        {
+            this->name1 = std::move(name1);
+            this->name2 = std::move(name2);
+        }
+        bool IsActive() override;
+        std::string const getName() override;
+    protected:
+        std::string name1;
+        std::string name2;
 };
 
 class SnareTargetTrigger : public DebuffTrigger

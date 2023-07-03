@@ -13,6 +13,7 @@
 #include "PlayerbotAIBase.h"
 #include "PlayerbotAIConfig.h"
 #include "PlayerbotSecurity.h"
+#include "SpellAuras.h"
 #include "WorldPacket.h"
 #include "PlayerbotTextMgr.h"
 
@@ -208,6 +209,66 @@ enum BotRoles : uint8
     BOT_ROLE_DPS    = 0x04
 };
 
+enum HUNTER_TABS {
+    HUNTER_TAB_BEASTMASTER,
+    HUNTER_TAB_MARKSMANSHIP,
+    HUNTER_TAB_SURVIVAL,
+};
+
+enum ROGUE_TABS {
+    ROGUE_TAB_ASSASSINATION,
+    ROGUE_TAB_COMBAT,
+    ROGUE_TAB_SUBTLETY
+};
+
+enum PRIEST_TABS {
+    PRIEST_TAB_DISIPLINE,
+    PRIEST_TAB_HOLY,
+    PRIEST_TAB_SHADOW,
+};
+
+enum DEATHKNIGT_TABS {
+    DEATHKNIGT_TAB_BLOOD,
+    DEATHKNIGT_TAB_FROST,
+    DEATHKNIGT_TAB_UNHOLY,
+};
+
+enum DRUID_TABS {
+    DRUID_TAB_BALANCE,
+    DRUID_TAB_FERAL,
+    DRUID_TAB_RESTORATION,
+};
+
+enum MAGE_TABS {
+    MAGE_TAB_ARCANE,
+    MAGE_TAB_FIRE,
+    MAGE_TAB_FROST,
+};
+
+enum SHAMAN_TABS {
+    SHAMAN_TAB_ELEMENTAL,
+    SHAMAN_TAB_ENHANCEMENT,
+    SHAMAN_TAB_RESTORATION,
+};
+
+enum PALADIN_TABS {
+    PALADIN_TAB_HOLY,
+    PALADIN_TAB_PROTECTION,
+    PALADIN_TAB_RETRIBUTION,
+};
+
+enum WARLOCK_TABS {
+    WARLOCK_TAB_AFFLICATION,
+    WARLOCK_TAB_DEMONOLOGY,
+    WARLOCK_TAB_DESTRUCTION,
+};
+
+enum WARRIOR_TABS {
+    WARRIOR_TAB_ARMS,
+    WARRIOR_TAB_FURY,
+    WARRIOR_TAB_PROTECTION,
+};
+
 class PacketHandlingHelper
 {
     public:
@@ -270,6 +331,8 @@ class PlayerbotAI : public PlayerbotAIBase
         bool IsTank(Player* player);
         bool IsHeal(Player* player);
         bool IsRanged(Player* player);
+        bool IsMainTank(Player* player);
+        bool IsAssistTank(Player* player);
         Creature* GetCreature(ObjectGuid guid);
         Unit* GetUnit(ObjectGuid guid);
         Player* GetPlayer(ObjectGuid guid);
@@ -305,7 +368,7 @@ class PlayerbotAI : public PlayerbotAIBase
 
         virtual bool CanCastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
         virtual bool CastSpell(std::string const name, Unit* target, Item* itemTarget = nullptr);
-        virtual bool HasAura(std::string const spellName, Unit* player, bool maxStack = false, bool checkIsOwner = false, int maxAmount = -1);
+        virtual bool HasAura(std::string const spellName, Unit* player, bool maxStack = false, bool checkIsOwner = false, int maxAmount = -1, bool checkDuration = false);
         virtual bool HasAnyAuraOf(Unit* player, ...);
 
         virtual bool IsInterruptableSpellCasting(Unit* player, std::string const spell);
@@ -315,6 +378,7 @@ class PlayerbotAI : public PlayerbotAIBase
         bool CanCastSpell(uint32 spellid, float x, float y, float z, uint8 effectMask, bool checkHasSpell = true, Item* itemTarget = nullptr);
 
         bool HasAura(uint32 spellId, Unit const* player);
+        Aura* GetAura(std::string const spellName, Unit* unit, bool checkIsOwner = false, bool checkDuration = false, int checkStack = -1);
         bool CastSpell(uint32 spellId, Unit* target, Item* itemTarget = nullptr);
         bool CastSpell(uint32 spellId, float x, float y, float z, Item* itemTarget = nullptr);
         bool canDispel(SpellInfo const* spellInfo, uint32 dispelType);
@@ -369,11 +433,11 @@ class PlayerbotAI : public PlayerbotAIBase
 
         bool CanMove();
         bool IsInRealGuild();
-
+        static std::vector<std::string> dispel_whitelist;
+        bool EqualLowercaseName(std::string s1, std::string s2);
     private:
         void _fillGearScoreData(Player* player, Item* item, std::vector<uint32>* gearScore, uint32& twoHandScore);
         bool IsTellAllowed(PlayerbotSecurityLevel securityLevel = PLAYERBOT_SECURITY_ALLOW_ALL);
-
     protected:
 	    Player* bot;
 	    Player* master;

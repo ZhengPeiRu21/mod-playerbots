@@ -40,19 +40,19 @@ class MageArmorTrigger : public BuffTrigger
 class LivingBombTrigger : public DebuffTrigger
 {
     public:
-        LivingBombTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "living bomb") { }
+        LivingBombTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "living bomb", 1, true) { }
 };
 
 class FireballTrigger : public DebuffTrigger
 {
     public:
-        FireballTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "fireball") { }
+        FireballTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "fireball", 1, true) { }
 };
 
 class PyroblastTrigger : public DebuffTrigger
 {
     public:
-        PyroblastTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "pyroblast") { }
+        PyroblastTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "pyroblast", 1, true) { }
 };
 
 class HotStreakTrigger : public HasAuraTrigger
@@ -133,4 +133,8 @@ class PresenceOfMindTrigger : public BuffTrigger
         PresenceOfMindTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "presence of mind") { }
 };
 
+class ArcaneBlastStackTrigger : public HasAuraStackTrigger {
+public:
+    ArcaneBlastStackTrigger(PlayerbotAI* ai) : HasAuraStackTrigger(ai, "arcane blast", 3, 1) {}
+};
 #endif

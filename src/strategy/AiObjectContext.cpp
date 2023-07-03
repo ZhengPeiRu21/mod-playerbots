@@ -20,7 +20,8 @@ AiObjectContext::AiObjectContext(PlayerbotAI* botAI) : PlayerbotAIAware(botAI)
     strategyContexts.Add(new MovementStrategyContext());
     strategyContexts.Add(new AssistStrategyContext());
     strategyContexts.Add(new QuestStrategyContext());
-
+    strategyContexts.Add(new RaidStrategyContext());
+    
     actionContexts.Add(new ActionContext());
     actionContexts.Add(new ChatActionContext());
     actionContexts.Add(new WorldPacketActionContext());
@@ -73,7 +74,7 @@ std::vector<std::string> AiObjectContext::Save()
         result.push_back(out.str());
     }
 
-    return std::move(result);
+    return result;
 }
 
 void AiObjectContext::Load(std::vector<std::string> data)

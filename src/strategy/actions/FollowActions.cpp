@@ -23,10 +23,22 @@ bool FollowAction::Execute(Event event)
         WorldLocation loc = formation->GetLocation();
         if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
             return false;
-
+        
         moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
 
+    if (Pet* pet = bot->GetPet())
+    {
+        if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
+        {
+            pet->SetReactState(REACT_PASSIVE);
+            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+            pet->GetCharmInfo()->SetIsFollowing(true);
+            pet->AttackStop();
+            pet->GetCharmInfo()->IsReturning();
+            pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
+        }
+    }
     //if (moved)
         //botAI->SetNextCheckDelay(sPlayerbotAIConfig->reactDelay);
 

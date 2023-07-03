@@ -45,13 +45,14 @@ void GenericHunterNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tri
     triggers.push_back(new TriggerNode("trueshot aura", NextAction::array(0, new NextAction("trueshot aura", 2.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
     triggers.push_back(new TriggerNode("low ammo", NextAction::array(0, new NextAction("say::low ammo", ACTION_NORMAL), nullptr)));
-    triggers.push_back(new TriggerNode("no ammo", NextAction::array(0, new NextAction("switch to melee", ACTION_NORMAL + 1), new NextAction("say::no ammo", ACTION_NORMAL), nullptr)));
-    triggers.push_back(new TriggerNode("has ammo", NextAction::array(0, new NextAction("switch to ranged", ACTION_NORMAL), nullptr)));
+    // triggers.push_back(new TriggerNode("no ammo", NextAction::array(0, new NextAction("switch to melee", ACTION_NORMAL + 1), new NextAction("say::no ammo", ACTION_NORMAL), nullptr)));
+    // triggers.push_back(new TriggerNode("has ammo", NextAction::array(0, new NextAction("switch to ranged", ACTION_NORMAL), nullptr)));
 }
 
 void HunterPetStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("call pet", 60.0f), nullptr)));
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("pet not happy", NextAction::array(0, new NextAction("feed pet", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("hunters pet low health", NextAction::array(0, new NextAction("mend pet", 60.0f), nullptr)));
     triggers.push_back(new TriggerNode("hunters pet dead", NextAction::array(0, new NextAction("revive pet", 60.0f), nullptr)));

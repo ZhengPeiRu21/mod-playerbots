@@ -7,15 +7,27 @@
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
+bool HunterAspectOfTheHawkTrigger::IsActive()
+{
+    Unit* target = GetTarget();
+    return SpellTrigger::IsActive() &&
+        !botAI->HasAura("aspect of the hawk", target) && !botAI->HasAura("aspect of the dragonhawk", target) &&
+        (!AI_VALUE2(bool, "has mana", "self target") || AI_VALUE2(uint8, "mana", "self target") > 70);
+}
+
 bool HunterNoStingsActiveTrigger::IsActive()
 {
 	Unit* target = AI_VALUE(Unit*, "current target");
-    return target && AI_VALUE2(uint8, "health", "current target") > 40 && !botAI->HasAura("serpent sting", target) &&
-        !botAI->HasAura("scorpid sting", target) && !botAI->HasAura("viper sting", target);
+    return target && AI_VALUE2(uint8, "health", "current target") > 15 && 
+        !botAI->HasAura("serpent sting", target, false, true) &&
+        !botAI->HasAura("scorpid sting", target, false, true) && 
+        !botAI->HasAura("viper sting", target, false, true);
 }
 
 bool HuntersPetDeadTrigger::IsActive()
 {
+    // Unit* pet = AI_VALUE(Unit*, "pet target");
+    // return pet && AI_VALUE2(bool, "dead", "pet target") && !AI_VALUE2(bool, "mounted", "self target");
     return AI_VALUE(bool, "pet dead") && !AI_VALUE2(bool, "mounted", "self target");
 }
 
@@ -32,7 +44,8 @@ bool HunterPetNotHappy::IsActive()
 
 bool HunterAspectOfTheViperTrigger::IsActive()
 {
-    return SpellTrigger::IsActive() && !botAI->HasAura(spell, GetTarget());
+    return SpellTrigger::IsActive() && !botAI->HasAura(spell, GetTarget()) && 
+                AI_VALUE2(uint8, "mana", "self target") < sPlayerbotAIConfig->lowMana;;
 }
 
 bool HunterAspectOfThePackTrigger::IsActive()
@@ -53,13 +66,13 @@ bool HunterHasAmmoTrigger::IsActive()
 bool SwitchToRangedTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    return botAI->HasStrategy("close", BOT_STATE_COMBAT) && target && (target->GetVictim() != bot ||
+    return botAI->HasStrategy("close", BOT_STATE_COMBAT) && target && (target->GetVictim() != bot &&
         sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
 }
 
 bool SwitchToMeleeTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && target && (target->GetVictim() == bot ||
+    return botAI->HasStrategy("ranged", BOT_STATE_COMBAT) && target && (target->GetVictim() == bot &&
         sServerFacade->IsDistanceLessOrEqualThan(AI_VALUE2(float, "distance", "current target"), 8.0f));
 }

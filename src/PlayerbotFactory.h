@@ -110,6 +110,7 @@ class PlayerbotFactory : public InventoryAction
         void Refresh();
         void Randomize(bool incremental);
         static std::list<uint32> classQuestIds;
+        void ClearEverything();
         void InitSkills();
 
         static uint32 tradeSkills[];
@@ -128,9 +129,11 @@ class PlayerbotFactory : public InventoryAction
         void ClearSpells();
         void ClearSkills();
         void InitAvailableSpells();
+        void InitClassSpells();
         void InitSpecialSpells();
-        void InitTalentsTree(bool incremental);
+        void InitTalentsTree(bool incremental = false, bool use_template = true);
         void InitTalents(uint32 specNo);
+        void InitTalentsByTemplate(uint32 specNo);
         void InitQuests(std::list<uint32>& questMap);
         void InitPet();
         void ClearInventory();
@@ -162,6 +165,9 @@ class PlayerbotFactory : public InventoryAction
         void LoadEnchantContainer();
         void ApplyEnchantTemplate();
         void ApplyEnchantTemplate(uint8 spec);
+        float CalculateItemScore(uint32 item_id);
+        bool IsShieldTank();
+        bool NotSameArmorType(uint32 item_subclass_armor);
         EnchantContainer::const_iterator GetEnchantContainerBegin() { return m_EnchantContainer.begin(); }
         EnchantContainer::const_iterator GetEnchantContainerEnd() { return m_EnchantContainer.end(); }
 

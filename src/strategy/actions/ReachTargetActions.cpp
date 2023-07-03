@@ -4,30 +4,13 @@
 
 #include "ReachTargetActions.h"
 #include "Event.h"
+#include "PlayerbotAIConfig.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
 
 bool ReachTargetAction::Execute(Event event)
 {
-    Unit* target = AI_VALUE(Unit*, GetTargetName());
-    if (!target)
-        return false;
-
-    UpdateMovementState();
-
-    float combatReach = bot->GetCombatReach() + target->GetCombatReach() + 4.0f / 3.0f;
-    if (distance < std::max(5.0f, combatReach))
-    {
-        return ChaseTo(target, 0.0f, GetFollowAngle());
-    }
-    else
-    {
-        combatReach = bot->GetCombatReach() + target->GetCombatReach();
-        bool inLos = bot->IsWithinLOSInMap(target);
-        bool  isFriend  = bot->IsFriendlyTo(target);
-        float chaseDist = inLos ? distance : isFriend ? distance / 2 : distance;
-        return ChaseTo(target, chaseDist - sPlayerbotAIConfig->contactDistance, bot->GetAngle(target));
-    }
+    return MoveTo(AI_VALUE(Unit*, GetTargetName()), distance);
 }
 
 bool ReachTargetAction::isUseful()
@@ -36,8 +19,7 @@ bool ReachTargetAction::isUseful()
     if (bot->IsNonMeleeSpellCast(true))
         return false;
 
-    Unit* target = AI_VALUE(Unit*, GetTargetName());
-    return target && (!bot->IsWithinDistInMap(target, distance) || (bot->IsWithinDistInMap(target, distance) && !bot->IsWithinLOSInMap(target)));
+    return AI_VALUE2(float, "distance", GetTargetName()) > (distance + sPlayerbotAIConfig->contactDistance);
 }
 
 std::string const ReachTargetAction::GetTargetName()

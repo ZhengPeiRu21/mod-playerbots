@@ -15,7 +15,7 @@ GuidVector AttackersValue::Calculate()
 
     GuidVector result;
     if (!botAI->AllowActivity(ALL_ACTIVITY))
-        return std::move(result);
+        return result;
 
     AddAttackersOf(bot, targets);
 
@@ -30,7 +30,7 @@ GuidVector AttackersValue::Calculate()
     if (bot->duel && bot->duel->Opponent)
         result.push_back(bot->duel->Opponent->GetGUID());
 
-	return std::move(result);
+	return result;
 }
 
 void AttackersValue::AddAttackersOf(Group* group, std::set<Unit*>& targets)
@@ -63,38 +63,60 @@ void AttackersValue::AddAttackersOf(Player* player, std::set<Unit*>& targets)
     if (!player || !player->IsInWorld() || player->IsBeingTeleported())
         return;
 
-	std::list<Unit*> units;
-	Acore::AnyUnfriendlyUnitInObjectRangeCheck u_check(player, player, sPlayerbotAIConfig->sightDistance);
-    Acore::UnitListSearcher<Acore::AnyUnfriendlyUnitInObjectRangeCheck> searcher(player, units, u_check);
-    Cell::VisitAllObjects(player, searcher, sPlayerbotAIConfig->sightDistance);
+	HostileRefMgr& refManager = player->getHostileRefMgr();
+    HostileReference *ref = refManager.getFirst();
+    if (!ref)
+        return;
 
-	for (Unit* unit : units)
+    while( ref )
     {
-        if (!player->GetGroup())
-        {
-            if (!unit->GetThreatMgr().GetThreat(player) && (!unit->GetThreatMgr().getCurrentVictim() || unit->GetThreatMgr().getCurrentVictim()->getTarget() != player))
-                continue;
-        }
+        ThreatMgr *threatMgr = ref->GetSource();
+        Unit *attacker = threatMgr->GetOwner();
+        Unit *victim = attacker->GetVictim();
 
-        targets.insert(unit);
+        if (player->IsValidAttackTarget(attacker) && player->GetDistance2d(attacker) < sPlayerbotAIConfig->sightDistance) {
+            targets.insert(attacker);
+        }
+        ref = ref->next();
     }
 }
 
 void AttackersValue::RemoveNonThreating(std::set<Unit*>& targets)
 {
-    for (std::set<Unit*>::iterator tIter = targets.begin(); tIter != targets.end();)
+    for(std::set<Unit *>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
         Unit* unit = *tIter;
-        if (!IsValidTarget(unit, bot))
+        if(!bot->IsWithinLOSInMap(unit) || bot->GetMapId() != unit->GetMapId() || !hasRealThreat(unit))
         {
-            std::set<Unit*>::iterator tIter2 = tIter;
+            std::set<Unit *>::iterator tIter2 = tIter;
             ++tIter;
             targets.erase(tIter2);
         }
         else
             ++tIter;
     }
+        // Unit* unit = *tIter;
+        // if (!IsValidTarget(unit, bot) || !bot->IsWithinLOSInMap(unit))
+        // {
+        //     std::set<Unit*>::iterator tIter2 = tIter;
+        //     ++tIter;
+        //     targets.erase(tIter2);
+        // }
+        // else
+        //     ++tIter;
 }
+
+bool AttackersValue::hasRealThreat(Unit *attacker)
+{
+    return attacker &&
+        attacker->IsInWorld() &&
+        attacker->IsAlive() &&
+        // !attacker->IsPolymorphed() &&
+        // !attacker->isInRoots() &&
+        !attacker->IsFriendlyTo(bot) &&
+        (attacker->GetThreatMgr().getCurrentVictim() || dynamic_cast<Player*>(attacker));
+}
+
 
 bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
 {
@@ -129,15 +151,16 @@ bool AttackersValue::IsPossibleTarget(Unit* attacker, Player* bot, float range)
         !(attacker->GetGUID().IsPet() && enemy) &&
         !(attacker->GetCreatureType() == CREATURE_TYPE_CRITTER && !attacker->IsInCombat()) && !(sPlayerbotAIConfig->IsInPvpProhibitedZone(attacker->GetAreaId()) &&
         (attacker->GetGUID().IsPlayer() || attacker->GetGUID().IsPet())) && (!c || (!c->IsInEvadeMode() && ((!isMemberBotGroup && botAI->HasStrategy("attack tagged", BOT_STATE_NON_COMBAT)) ||
-        leaderHasThreat || (!c->hasLootRecipient() && (!c->GetVictim() || c->GetVictim() && ((!c->GetVictim()->IsPlayer() || bot->IsInSameGroupWith(c->GetVictim()->ToPlayer())) ||
-        (botAI->GetMaster() && c->GetVictim() == botAI->GetMaster())))) || c->isTappedBy(bot))));
+        leaderHasThreat || (!c->hasLootRecipient() && (!c->GetVictim() || (c->GetVictim() && ((!c->GetVictim()->IsPlayer() || bot->IsInSameGroupWith(c->GetVictim()->ToPlayer())) ||
+        (botAI->GetMaster() && c->GetVictim() == botAI->GetMaster()))))) || c->isTappedBy(bot))));
 }
 
 bool AttackersValue::IsValidTarget(Unit *attacker, Player *bot)
 {
-    return  IsPossibleTarget(attacker, bot) && (attacker->GetThreatMgr().getCurrentVictim() || attacker->GetGuidValue(UNIT_FIELD_TARGET) ||
+    return attacker->IsVisible() && IsPossibleTarget(attacker, bot) && (attacker->GetThreatMgr().getCurrentVictim() || attacker->GetGuidValue(UNIT_FIELD_TARGET) ||
         attacker->GetGUID().IsPlayer() || attacker->GetGUID() == GET_PLAYERBOT_AI(bot)->GetAiObjectContext()->GetValue<ObjectGuid>("pull target")->Get());
 }
+
 bool PossibleAddsValue::Calculate()
 {
     GuidVector possible = botAI->GetAiObjectContext()->GetValue<GuidVector >("possible targets no los")->Get();

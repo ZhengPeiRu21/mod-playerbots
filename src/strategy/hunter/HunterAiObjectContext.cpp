@@ -80,6 +80,8 @@ class HunterTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["has ammo"] = &HunterTriggerFactoryInternal::has_ammo;
             creators["switch to melee"] = &HunterTriggerFactoryInternal::switch_to_melee;
             creators["switch to ranged"] = &HunterTriggerFactoryInternal::switch_to_ranged;
+            creators["misdirection on main tank"] = &HunterTriggerFactoryInternal::misdirection_on_main_tank;
+            creators["tranquilizing shot"] = &HunterTriggerFactoryInternal::remove_enrage;
         }
 
     private:
@@ -105,6 +107,8 @@ class HunterTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* has_ammo(PlayerbotAI* botAI) { return new HunterHasAmmoTrigger(botAI); }
         static Trigger* switch_to_melee(PlayerbotAI* botAI) { return new SwitchToMeleeTrigger(botAI); }
         static Trigger* switch_to_ranged(PlayerbotAI* botAI) { return new SwitchToRangedTrigger(botAI); }
+        static Trigger* misdirection_on_main_tank(PlayerbotAI* ai) { return new MisdirectionOnMainTankTrigger(ai); }
+        static Trigger* remove_enrage(PlayerbotAI* ai) { return new TargetRemoveEnrageTrigger(ai); }
 };
 
 class HunterAiObjectContextInternal : public NamedObjectContext<Action>
@@ -148,6 +152,11 @@ class HunterAiObjectContextInternal : public NamedObjectContext<Action>
             creators["bestial wrath"] = &HunterAiObjectContextInternal::bestial_wrath;
             creators["scare beast"] = &HunterAiObjectContextInternal::scare_beast;
             creators["scare beast on cc"] = &HunterAiObjectContextInternal::scare_beast_on_cc;
+            creators["aspect of the dragonhawk"] = &HunterAiObjectContextInternal::aspect_of_the_dragonhawk;
+            creators["tranquilizing shot"] = &HunterAiObjectContextInternal::tranquilizing_shot;
+            creators["steady shot"] = &HunterAiObjectContextInternal::steady_shot;
+            creators["kill shot"] = &HunterAiObjectContextInternal::kill_shot;
+            creators["misdirection on main tank"] = &HunterAiObjectContextInternal::misdirection_on_main_tank;
         }
 
     private:
@@ -186,6 +195,11 @@ class HunterAiObjectContextInternal : public NamedObjectContext<Action>
         static Action* aspect_of_the_cheetah(PlayerbotAI* botAI) { return new CastAspectOfTheCheetahAction(botAI); }
         static Action* wing_clip(PlayerbotAI* botAI) { return new CastWingClipAction(botAI); }
         static Action* raptor_strike(PlayerbotAI* botAI) { return new CastRaptorStrikeAction(botAI); }
+        static Action* aspect_of_the_dragonhawk(PlayerbotAI* ai) { return new CastAspectOfTheDragonhawkAction(ai); }
+        static Action* tranquilizing_shot(PlayerbotAI* ai) { return new CastTranquilizingShotAction(ai); }
+        static Action* steady_shot(PlayerbotAI* ai) { return new CastSteadyShotAction(ai); }
+        static Action* kill_shot(PlayerbotAI* ai) { return new CastKillShotAction(ai); }
+        static Action* misdirection_on_main_tank(PlayerbotAI* ai) { return new CastMisdirectionOnMainTankAction(ai); }
 };
 
 HunterAiObjectContext::HunterAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)

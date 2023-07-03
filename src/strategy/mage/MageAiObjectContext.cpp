@@ -13,19 +13,20 @@
 #include "PullStrategy.h"
 #include "Playerbots.h"
 
-class StrategyFactoryInternal : public NamedObjectContext<Strategy>
+class MageStrategyFactoryInternal : public NamedObjectContext<Strategy>
 {
     public:
-        StrategyFactoryInternal()
+        MageStrategyFactoryInternal()
         {
-            creators["nc"] = &StrategyFactoryInternal::nc;
-            creators["pull"] = &StrategyFactoryInternal::pull;
-            creators["fire aoe"] = &StrategyFactoryInternal::fire_aoe;
-            creators["frost aoe"] = &StrategyFactoryInternal::frost_aoe;
-            creators["cure"] = &StrategyFactoryInternal::cure;
-            creators["buff"] = &StrategyFactoryInternal::buff;
-            creators["boost"] = &StrategyFactoryInternal::boost;
-            creators["cc"] = &StrategyFactoryInternal::cc;
+            creators["nc"] = &MageStrategyFactoryInternal::nc;
+            creators["pull"] = &MageStrategyFactoryInternal::pull;
+            creators["fire aoe"] = &MageStrategyFactoryInternal::fire_aoe;
+            creators["frost aoe"] = &MageStrategyFactoryInternal::frost_aoe;
+            creators["arcane aoe"] = &MageStrategyFactoryInternal::arcane_aoe;
+            creators["cure"] = &MageStrategyFactoryInternal::cure;
+            creators["buff"] = &MageStrategyFactoryInternal::buff;
+            creators["boost"] = &MageStrategyFactoryInternal::boost;
+            creators["cc"] = &MageStrategyFactoryInternal::cc;
         }
 
     private:
@@ -33,20 +34,21 @@ class StrategyFactoryInternal : public NamedObjectContext<Strategy>
         static Strategy* pull(PlayerbotAI* botAI) { return new PullStrategy(botAI, "shoot"); }
         static Strategy* fire_aoe(PlayerbotAI* botAI) { return new FireMageAoeStrategy(botAI); }
         static Strategy* frost_aoe(PlayerbotAI* botAI) { return new FrostMageAoeStrategy(botAI); }
+        static Strategy* arcane_aoe(PlayerbotAI* botAI) { return new ArcaneMageAoeStrategy(botAI); }
         static Strategy* cure(PlayerbotAI* botAI) { return new MageCureStrategy(botAI); }
         static Strategy* buff(PlayerbotAI* botAI) { return new MageBuffStrategy(botAI); }
         static Strategy* boost(PlayerbotAI* botAI) { return new MageBoostStrategy(botAI); }
         static Strategy* cc(PlayerbotAI* botAI) { return new MageCcStrategy(botAI); }
 };
 
-class MageStrategyFactoryInternal : public NamedObjectContext<Strategy>
+class MageCombatStrategyFactoryInternal : public NamedObjectContext<Strategy>
 {
     public:
-        MageStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
+        MageCombatStrategyFactoryInternal() : NamedObjectContext<Strategy>(false, true)
         {
-            creators["frost"] = &MageStrategyFactoryInternal::frost;
-            creators["fire"] = &MageStrategyFactoryInternal::fire;
-            creators["arcane"] = &MageStrategyFactoryInternal::arcane;
+            creators["frost"] = &MageCombatStrategyFactoryInternal::frost;
+            creators["fire"] = &MageCombatStrategyFactoryInternal::fire;
+            creators["arcane"] = &MageCombatStrategyFactoryInternal::arcane;
         }
 
     private:
@@ -95,7 +97,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
             creators["presence of mind"] = &MageTriggerFactoryInternal::presence_of_mind;
             creators["fire ward"] = &MageTriggerFactoryInternal::fire_ward;
             creators["frost ward"] = &MageTriggerFactoryInternal::frost_ward;
-
+            creators["arcane blast stack"] = &MageTriggerFactoryInternal::arcane_blast_stack;
         }
 
     private:
@@ -120,6 +122,7 @@ class MageTriggerFactoryInternal : public NamedObjectContext<Trigger>
         static Trigger* missile_barrage(PlayerbotAI* botAI) { return new MissileBarrageTrigger(botAI); }
         static Trigger* arcane_blast(PlayerbotAI* botAI) { return new ArcaneBlastTrigger(botAI); }
         static Trigger* counterspell_enemy_healer(PlayerbotAI* botAI) { return new CounterspellEnemyHealerTrigger(botAI); }
+        static Trigger* arcane_blast_stack(PlayerbotAI* botAI) { return new ArcaneBlastStackTrigger(botAI); }
 };
 
 class MageAiObjectContextInternal : public NamedObjectContext<Action>
@@ -213,7 +216,7 @@ class MageAiObjectContextInternal : public NamedObjectContext<Action>
 MageAiObjectContext::MageAiObjectContext(PlayerbotAI* botAI) : AiObjectContext(botAI)
 {
     strategyContexts.Add(new MageStrategyFactoryInternal());
-    strategyContexts.Add(new MageStrategyFactoryInternal());
+    strategyContexts.Add(new MageCombatStrategyFactoryInternal());
     strategyContexts.Add(new MageBuffStrategyFactoryInternal());
     actionContexts.Add(new MageAiObjectContextInternal());
     triggerContexts.Add(new MageTriggerFactoryInternal());

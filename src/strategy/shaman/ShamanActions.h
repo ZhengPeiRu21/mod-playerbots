@@ -158,6 +158,7 @@ class CastCleansingTotemAction : public CastTotemAction
 {
     public:
         CastCleansingTotemAction(PlayerbotAI* botAI) : CastTotemAction(botAI, "cleansing totem") { }
+		virtual bool isUseful();
 };
 
 class CastFlametongueTotemAction : public CastTotemAction
@@ -291,13 +292,13 @@ class CastCleanseSpiritDiseaseOnPartyAction : public CurePartyMemberAction
 class CastFlameShockAction : public CastDebuffSpellAction
 {
     public:
-        CastFlameShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flame shock") { }
+        CastFlameShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "flame shock", true) { }
 };
 
 class CastEarthShockAction : public CastDebuffSpellAction
 {
     public:
-        CastEarthShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "earth shock") { }
+        CastEarthShockAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "earth shock", true) { }
 };
 
 class CastFrostShockAction : public CastSnareSpellAction
@@ -342,30 +343,63 @@ class CastWindShearOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
         CastWindShearOnEnemyHealerAction(PlayerbotAI* botAI) : CastSpellOnEnemyHealerAction(botAI, "wind shear") { }
 };
 
-class CastCurePoisonAction : public CastCureSpellAction
+// class CastCurePoisonAction : public CastCureSpellAction
+// {
+//     public:
+//         CastCurePoisonAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "cure poison") { }
+// };
+
+// class CastCurePoisonOnPartyAction : public CurePartyMemberAction
+// {
+//     public:
+//         CastCurePoisonOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cure poison", DISPEL_POISON) { }
+// };
+
+// class CastCureDiseaseAction : public CastCureSpellAction
+// {
+//     public:
+//         CastCureDiseaseAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "cure disease") { }
+// };
+
+// class CastCureDiseaseOnPartyAction : public CurePartyMemberAction
+// {
+//     public:
+//         CastCureDiseaseOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cure disease", DISPEL_DISEASE) { }
+
+//         std::string const getName() override { return "cure disease on party"; }
+// };
+
+class CastLavaBurstAction : public CastSpellAction
 {
     public:
-        CastCurePoisonAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "cure poison") { }
+        CastLavaBurstAction(PlayerbotAI* ai) : CastSpellAction(ai, "lava burst") {}
 };
 
-class CastCurePoisonOnPartyAction : public CurePartyMemberAction
+class CastEarthShieldOnMainTankAction : public BuffOnMainTankAction
+{
+	public:
+		CastEarthShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "earth shield", true) {}
+};
+
+class CastTotemOfWrathAction : public CastTotemAction
 {
     public:
-        CastCurePoisonOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cure poison", DISPEL_POISON) { }
+        CastTotemOfWrathAction(PlayerbotAI* ai) : CastTotemAction(ai, "totem of wrath") {}
+        virtual std::string const GetTargetName() override { return "self target"; }
+		virtual bool isUseful() override { return CastTotemAction::isUseful(); }
 };
 
-class CastCureDiseaseAction : public CastCureSpellAction
+class CastFireElementalTotemAction : public CastTotemAction
 {
     public:
-        CastCureDiseaseAction(PlayerbotAI* botAI) : CastCureSpellAction(botAI, "cure disease") { }
+        CastFireElementalTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "fire elemental totem") {}
+        virtual std::string const GetTargetName() override { return "self target"; }
+		virtual bool isUseful() override { return CastTotemAction::isUseful(); }
 };
 
-class CastCureDiseaseOnPartyAction : public CurePartyMemberAction
+class CastWrathOfAirTotemAction : public CastTotemAction
 {
-    public:
-        CastCureDiseaseOnPartyAction(PlayerbotAI* botAI) : CurePartyMemberAction(botAI, "cure disease", DISPEL_DISEASE) { }
-
-        std::string const getName() override { return "cure disease on party"; }
+	public:
+		CastWrathOfAirTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "wrath of air totem") {}
 };
-
 #endif

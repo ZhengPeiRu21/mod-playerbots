@@ -5,6 +5,7 @@
 #ifndef _PLAYERBOT_PALADINACTIONS_H
 #define _PLAYERBOT_PALADINACTIONS_H
 
+#include "AiObject.h"
 #include "GenericSpellActions.h"
 #include "SharedDefines.h"
 
@@ -20,10 +21,11 @@ BUFF_ACTION(CastSealOfCommandAction, "seal of command");
 BUFF_ACTION(CastSealOfVengeanceAction, "seal of vengeance");
 
 // judgements
-DEBUFF_ACTION_R(CastJudgementAction, "judgement", 10.0f);
-DEBUFF_ACTION_R(CastJudgementOfLightAction, "judgement of light", 10.0f);
-DEBUFF_ACTION_R(CastJudgementOfWisdomAction, "judgement of wisdom", 10.0f);
-DEBUFF_ACTION_R(CastJudgementOfJusticeAction, "judgement of justice", 10.0f);
+SPELL_ACTION(CastJudgementAction, "judgement");
+
+SPELL_ACTION(CastJudgementOfLightAction, "judgement of light");
+SPELL_ACTION(CastJudgementOfWisdomAction, "judgement of wisdom");
+SPELL_ACTION(CastJudgementOfJusticeAction, "judgement of justice");
 
 // auras
 BUFF_ACTION(CastDevotionAuraAction, "devotion aura");
@@ -39,7 +41,7 @@ SPELL_ACTION(CastHolyShockAction, "holy shock");
 HEAL_PARTY_ACTION(CastHolyShockOnPartyAction, "holy shock");
 
 // consecration
-SPELL_ACTION(CastConsecrationAction, "consecration");
+MELEE_ACTION(CastConsecrationAction, "consecration");
 
 // repentance
 SNARE_ACTION(CastRepentanceSnareAction, "repentance");
@@ -259,6 +261,7 @@ class CastRighteousDefenseAction : public CastSpellAction
 {
     public:
         CastRighteousDefenseAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "righteous defense") { }
+		virtual Unit* GetTarget() override;
 };
 
 class CastCleansePoisonAction : public CastCureSpellAction
@@ -343,4 +346,27 @@ class CastTurnUndeadAction : public CastBuffSpellAction
 
 PROTECT_ACTION(CastBlessingOfProtectionProtectAction, "blessing of protection");
 
+class CastDivinePleaAction : public CastBuffSpellAction
+{
+public:
+	CastDivinePleaAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "divine plea") {}
+};
+
+class ShieldOfRighteousnessAction : public CastMeleeSpellAction
+{
+public:
+	ShieldOfRighteousnessAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "shield of righteousness") {}
+};
+
+class CastBeaconOfLightOnMainTankAction : public BuffOnMainTankAction
+{
+public:
+	CastBeaconOfLightOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "beacon of light", true) {}
+};
+
+class CastSacredShieldOnMainTankAction : public BuffOnMainTankAction
+{
+public:
+	CastSacredShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "sacred shield", false) {}
+};
 #endif

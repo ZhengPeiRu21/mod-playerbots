@@ -15,33 +15,37 @@ static float GetSpeedInMotion(Unit* target)
 bool EnemyTooCloseForSpellTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    if (target)
-    {
-        if (target->GetTarget() == bot->GetGUID() && !bot->GetGroup() && !target->HasUnitState(UNIT_STATE_ROOT) && GetSpeedInMotion(target) > GetSpeedInMotion(bot) * 0.65f)
-            return false;
+    return target && target->GetVictim() != bot && 
+        target->GetObjectSize() <= 10.0f && 
+        AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig->tooCloseDistance;
+//     Unit* target = AI_VALUE(Unit*, "current target");
+//     if (!target) {
+//         return false;
+//     }
 
-        bool isBoss = false;
-        bool isRaid = false;
-        float combatReach = bot->GetCombatReach() + target->GetCombatReach();
-        float targetDistance = sServerFacade->GetDistance2d(bot, target) + combatReach;
-        if (target->GetTypeId() == TYPEID_UNIT)
-        {
-            Creature* creature = botAI->GetCreature(target->GetGUID());
-                if (creature)
-                {
-                    isBoss = creature->isWorldBoss();
-                }
-        }
+//     if (target->GetTarget() == bot->GetGUID() && !bot->GetGroup() && !target->HasUnitState(UNIT_STATE_ROOT) && GetSpeedInMotion(target) > GetSpeedInMotion(bot) * 0.65f)
+//         return false;
 
-        if (bot->GetMap() && bot->GetMap()->IsRaid())
-            isRaid = true;
+//     bool isBoss = false;
+//     bool isRaid = false;
+//     float combatReach = bot->GetCombatReach() + target->GetCombatReach();
+//     float targetDistance = sServerFacade->GetDistance2d(bot, target) + combatReach;
+//     if (target->GetTypeId() == TYPEID_UNIT)
+//     {
+//         Creature* creature = botAI->GetCreature(target->GetGUID());
+//             if (creature)
+//             {
+//                 isBoss = creature->isWorldBoss();
+//             }
+//     }
 
-//        if (isBoss || isRaid)
-//            return sServerFacade->IsDistanceLessThan(targetDistance, (botAI->GetRange("spell") + combatReach) / 2);
+//     if (bot->GetMap() && bot->GetMap()->IsRaid())
+//         isRaid = true;
 
-        return sServerFacade->IsDistanceLessOrEqualThan(targetDistance, (botAI->GetRange("spell") + combatReach / 2));
-    }
-    return false;
+// //    if (isBoss || isRaid)
+// //        return sServerFacade->IsDistanceLessThan(targetDistance, (sPlayerbotAIConfig->tooCloseDistance + combatReach) / 2);
+
+//     return sServerFacade->IsDistanceLessOrEqualThan(targetDistance, (sPlayerbotAIConfig->tooCloseDistance + combatReach / 2));
 }
 
 bool EnemyTooCloseForAutoShotTrigger::IsActive()
@@ -75,32 +79,35 @@ bool EnemyTooCloseForAutoShotTrigger::IsActive()
 bool EnemyTooCloseForShootTrigger::IsActive()
 {
     Unit* target = AI_VALUE(Unit*, "current target");
-    if (!target)
-        return false;
+    return target && target->GetVictim() != bot && AI_VALUE2(float, "distance", "current target") <= sPlayerbotAIConfig->shootDistance;
 
-    if (target->GetTarget() == bot->GetGUID() && !bot->GetGroup() && !target->HasUnitState(UNIT_STATE_ROOT) && GetSpeedInMotion(target) > GetSpeedInMotion(bot) * 0.65f)
-        return false;
+//     Unit* target = AI_VALUE(Unit*, "current target");
+//     if (!target)
+//         return false;
 
-    bool isBoss = false;
-    bool isRaid = false;
-    float combatReach = bot->GetCombatReach() + target->GetCombatReach();
-    float targetDistance = sServerFacade->GetDistance2d(bot, target) + combatReach;
-    if (target->GetTypeId() == TYPEID_UNIT)
-    {
-        Creature* creature = botAI->GetCreature(target->GetGUID());
-        if (creature)
-        {
-            isBoss = creature->isWorldBoss();
-        }
-    }
+//     if (target->GetTarget() == bot->GetGUID() && !bot->GetGroup() && !target->HasUnitState(UNIT_STATE_ROOT) && GetSpeedInMotion(target) > GetSpeedInMotion(bot) * 0.65f)
+//         return false;
 
-    if (bot->GetMap() && bot->GetMap()->IsRaid())
-        isRaid = true;
+//     bool isBoss = false;
+//     bool isRaid = false;
+//     float combatReach = bot->GetCombatReach() + target->GetCombatReach();
+//     float targetDistance = sServerFacade->GetDistance2d(bot, target) + combatReach;
+//     if (target->GetTypeId() == TYPEID_UNIT)
+//     {
+//         Creature* creature = botAI->GetCreature(target->GetGUID());
+//         if (creature)
+//         {
+//             isBoss = creature->isWorldBoss();
+//         }
+//     }
 
-//    if (isBoss || isRaid)
-//        return sServerFacade->IsDistanceLessThan(targetDistance, botAI->GetRange("shoot") + combatReach);
+//     if (bot->GetMap() && bot->GetMap()->IsRaid())
+//         isRaid = true;
 
-    return sServerFacade->IsDistanceLessOrEqualThan(targetDistance, (botAI->GetRange("shoot") + combatReach / 2));
+// //    if (isBoss || isRaid)
+// //        return sServerFacade->IsDistanceLessThan(targetDistance, botAI->GetRange("shoot") + combatReach);
+
+//     return sServerFacade->IsDistanceLessOrEqualThan(targetDistance, (botAI->GetRange("shoot") + combatReach / 2));
 }
 
 bool EnemyTooCloseForMeleeTrigger::IsActive()
@@ -128,25 +135,25 @@ EnemyOutOfSpellRangeTrigger::EnemyOutOfSpellRangeTrigger(PlayerbotAI* botAI) : O
 {
 }
 
-bool EnemyOutOfSpellRangeTrigger::IsActive()
-{
-    Unit* target = AI_VALUE(Unit*, GetTargetName());
-    if (!target)
-        return false;
+// bool EnemyOutOfSpellRangeTrigger::IsActive()
+// {
+//     Unit* target = AI_VALUE(Unit*, GetTargetName());
+//     if (!target)
+//         return false;
 
-    float combatReach = bot->GetCombatReach() + target->GetCombatReach();
-    return target && (sServerFacade->GetDistance2d(bot, target) > (distance + combatReach + sPlayerbotAIConfig->contactDistance) || !bot->IsWithinLOSInMap(target));
-}
+//     float combatReach = bot->GetCombatReach() + target->GetCombatReach();
+//     return target && (sServerFacade->GetDistance2d(bot, target) > (distance + combatReach + sPlayerbotAIConfig->contactDistance) || !bot->IsWithinLOSInMap(target));
+// }
 
-bool EnemyOutOfMeleeTrigger::IsActive()
-{
-    Unit* target = AI_VALUE(Unit*, GetTargetName());
-    if (!target)
-        return false;
+// bool EnemyOutOfMeleeTrigger::IsActive()
+// {
+//     Unit* target = AI_VALUE(Unit*, GetTargetName());
+//     if (!target)
+//         return false;
 
-    float targetDistance = sServerFacade->GetDistance2d(bot, target);
-    return target && (targetDistance > std::max(5.0f, bot->GetCombatReach() + target->GetCombatReach()) || (!bot->IsWithinLOSInMap(target) && targetDistance > 5.0f));
-}
+//     float targetDistance = sServerFacade->GetDistance2d(bot, target);
+//     return target && (targetDistance > std::max(5.0f, bot->GetCombatReach() + target->GetCombatReach()) || (!bot->IsWithinLOSInMap(target) && targetDistance > 5.0f));
+// }
 
 bool PartyMemberToHealOutOfSpellRangeTrigger::IsActive()
 {
@@ -159,7 +166,7 @@ bool PartyMemberToHealOutOfSpellRangeTrigger::IsActive()
 }
 
 PartyMemberToHealOutOfSpellRangeTrigger::PartyMemberToHealOutOfSpellRangeTrigger(PlayerbotAI* botAI) :
-    OutOfRangeTrigger(botAI, "party member to heal out of spell range", botAI->GetRange("heal"))
+    OutOfRangeTrigger(botAI, "party member to heal out of spell range", botAI->GetRange("heal") + 1.0f)
 {
 }
 

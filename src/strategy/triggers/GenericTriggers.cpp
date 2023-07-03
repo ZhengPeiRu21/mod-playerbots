@@ -4,7 +4,11 @@
 
 #include "GenericTriggers.h"
 #include "BattlegroundWS.h"
+#include "ObjectGuid.h"
 #include "Playerbots.h"
+#include "SharedDefines.h"
+#include "TemporarySummon.h"
+#include <string>
 
 bool LowManaTrigger::IsActive()
 {
@@ -18,7 +22,15 @@ bool MediumManaTrigger::IsActive()
 
 bool NoPetTrigger::IsActive()
 {
-    return !AI_VALUE(Unit*, "pet target") && !AI_VALUE2(bool, "mounted", "self target");
+    return (bot->GetMinionGUID().IsEmpty()) && 
+        (!AI_VALUE(Unit*, "pet target")) && 
+        (!bot->GetGuardianPet()) && 
+        (!bot->GetFirstControlled()) && 
+        (!AI_VALUE2(bool, "mounted", "self target"));
+}
+
+bool HasPetTrigger::IsActive() {
+    return (AI_VALUE(Unit*, "pet target")) && !AI_VALUE2(bool, "mounted", "self target");;
 }
 
 bool HighManaTrigger::IsActive()
@@ -145,7 +157,23 @@ bool MyAttackerCountTrigger::IsActive()
 
 bool AoeTrigger::IsActive()
 {
-    return AI_VALUE2(bool, "combat", "self target") && AI_VALUE(uint8, "aoe count") >= amount && AI_VALUE(uint8, "attacker count") >= amount;
+    Unit* current_target = AI_VALUE(Unit*, "current target");
+	if (!current_target) {
+		return false;
+	}
+	GuidVector attackers = context->GetValue<GuidVector>("attackers")->Get();
+	int attackers_count = 0;
+    for (ObjectGuid const guid : attackers)
+    {
+        Unit* unit = botAI->GetUnit(guid);
+        if (!unit || !unit->IsAlive())
+            continue;
+
+        if (unit->GetExactDist2d(current_target) <= range) {
+			attackers_count++;
+		}
+    }
+    return attackers_count >= amount;
 }
 
 bool NoFoodTrigger::IsActive()
@@ -173,7 +201,7 @@ bool TargetInSightTrigger::IsActive()
 
 bool DebuffTrigger::IsActive()
 {
-	return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > 15;
+	return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > life_bound;
 }
 
 bool SpellTrigger::IsActive()
@@ -311,7 +339,14 @@ bool AttackerCountTrigger::IsActive()
 
 bool HasAuraTrigger::IsActive()
 {
-	return botAI->HasAura(getName(), GetTarget());
+	return botAI->HasAura(getName(), GetTarget(), false, false, -1, true);
+}
+
+bool HasAuraStackTrigger::IsActive()
+{
+	Aura *aura = botAI->GetAura(getName(), GetTarget(), false, true, stack);
+	// sLog->outMessage("playerbot", LOG_LEVEL_DEBUG, "HasAuraStackTrigger::IsActive %s %d", getName(), aura ? aura->GetStackAmount() : -1);
+	return aura;
 }
 
 bool TimerTrigger::IsActive()
@@ -515,4 +550,9 @@ bool IsFallingFarTrigger::IsActive()
 bool HasAreaDebuffTrigger::IsActive()
 {
     return AI_VALUE2(bool, "has area debuff", "self target");
+}
+
+Value<Unit*>* BuffOnMainTankTrigger::GetTargetValue()
+{
+	return context->GetValue<Unit*>("main tank", spell);
 }

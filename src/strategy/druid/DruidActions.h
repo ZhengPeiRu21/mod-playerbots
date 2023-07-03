@@ -17,10 +17,10 @@ class CastFaerieFireAction : public CastDebuffSpellAction
 		CastFaerieFireAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "faerie fire") { }
 };
 
-class CastFaerieFireFeralAction : public CastDebuffSpellAction
+class CastFaerieFireFeralAction : public CastSpellAction
 {
     public:
-        CastFaerieFireFeralAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "faerie fire (feral)") { }
+        CastFaerieFireFeralAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "faerie fire (feral)") { }
 };
 
 class CastRejuvenationAction : public CastHealingSpellAction
@@ -134,13 +134,13 @@ class CastHurricaneAction : public CastSpellAction
 class CastMoonfireAction : public CastDebuffSpellAction
 {
 	public:
-		CastMoonfireAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "moonfire") { }
+		CastMoonfireAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "moonfire", true) { }
 };
 
 class CastInsectSwarmAction : public CastDebuffSpellAction
 {
 	public:
-		CastInsectSwarmAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "insect swarm") { }
+		CastInsectSwarmAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "insect swarm", true) { }
 };
 
 class CastStarfireAction : public CastSpellAction
@@ -236,4 +236,27 @@ class CastNaturesSwiftnessAction : public CastBuffSpellAction
         CastNaturesSwiftnessAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "nature's swiftness") { }
 };
 
+class CastWildGrowthOnPartyAction : public HealPartyMemberAction
+{
+public:
+	CastWildGrowthOnPartyAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "wild growth") {}
+};
+
+class CastPartySwiftmendAction : public HealPartyMemberAction
+{
+public:
+	CastPartySwiftmendAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "swiftmend") {}
+};
+
+class CastPartyNourishAction : public HealPartyMemberAction
+{
+public:
+	CastPartyNourishAction(PlayerbotAI* ai) : HealPartyMemberAction(ai, "nourish") {}
+};
+
+class CastDruidRemoveCurseOnPartyAction : public CurePartyMemberAction
+{
+    public:
+        CastDruidRemoveCurseOnPartyAction(PlayerbotAI* ai) : CurePartyMemberAction(ai, "remove curse", DISPEL_CURSE) {}
+};
 #endif

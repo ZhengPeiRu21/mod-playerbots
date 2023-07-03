@@ -545,7 +545,7 @@ std::vector<std::string> Engine::GetStrategies()
         result.push_back(i->first);
     }
 
-    return std::move(result);
+    return result;
 }
 
 void Engine::PushAgain(ActionNode* actionNode, float relevance, Event event)
@@ -643,7 +643,7 @@ void Engine::LogAction(char const* format, ...)
         if (sPlayerbotAIConfig->logInGroupOnly && !bot->GetGroup())
             return;
 
-        LOG_INFO("playerbots",  "{} {}", bot->GetName().c_str(), buf);
+        LOG_DEBUG("playerbots",  "{} {}", bot->GetName().c_str(), buf);
     }
 }
 

@@ -58,6 +58,7 @@ void ChatCommandHandlerStrategy::InitTriggers(std::vector<TriggerNode*>& trigger
     triggers.push_back(new TriggerNode("attackers", NextAction::array(0, new NextAction("tell attackers", relevance), nullptr)));
     triggers.push_back(new TriggerNode("target", NextAction::array(0, new NextAction("tell target", relevance), nullptr)));
     triggers.push_back(new TriggerNode("ready", NextAction::array(0, new NextAction("ready check", relevance), nullptr)));
+    triggers.push_back(new TriggerNode("naxx", NextAction::array(0, new NextAction("naxx chat shortcut", relevance), NULL)));
 }
 
 ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : PassTroughStrategy(botAI)
@@ -70,6 +71,7 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("reputation");
     supported.push_back("log");
     supported.push_back("los");
+    supported.push_back("aura");
     supported.push_back("drop");
     supported.push_back("share");
     supported.push_back("ll");
@@ -123,4 +125,5 @@ ChatCommandHandlerStrategy::ChatCommandHandlerStrategy(PlayerbotAI* botAI) : Pas
     supported.push_back("guild remove");
     supported.push_back("guild leave");
     supported.push_back("rtsc");
+    supported.push_back("drink");
 }

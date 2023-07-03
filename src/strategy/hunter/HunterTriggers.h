@@ -6,11 +6,17 @@
 #define _PLAYERBOT_HUNTERTRIGGERS_H
 
 #include "GenericTriggers.h"
+#include "Trigger.h"
+#include "CureTriggers.h"
 
 class PlayerbotAI;
 
-BEGIN_TRIGGER(HunterNoStingsActiveTrigger, Trigger)
-END_TRIGGER()
+class HunterNoStingsActiveTrigger : public Trigger
+{
+    public:
+        HunterNoStingsActiveTrigger(PlayerbotAI* botAI): Trigger(botAI, "no stings") {}
+        bool IsActive() override;
+};
 
 class AutoShotTrigger : public Trigger
 {
@@ -24,6 +30,7 @@ class HunterAspectOfTheHawkTrigger : public BuffTrigger
 {
     public:
         HunterAspectOfTheHawkTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "aspect of the hawk") { }
+        bool IsActive() override;
 };
 
 class HunterAspectOfTheWildTrigger : public BuffTrigger
@@ -57,7 +64,7 @@ END_TRIGGER()
 class BlackArrowTrigger : public DebuffTrigger
 {
     public:
-        BlackArrowTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "black arrow") { }
+        BlackArrowTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "black arrow", 1, true) { }
 };
 
 class HuntersMarkTrigger : public DebuffTrigger
@@ -87,7 +94,7 @@ class TrueshotAuraTrigger : public BuffTrigger
 class SerpentStingOnAttackerTrigger : public DebuffOnAttackerTrigger
 {
     public:
-        SerpentStingOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "serpent sting") { }
+        SerpentStingOnAttackerTrigger(PlayerbotAI* botAI) : DebuffOnAttackerTrigger(botAI, "serpent sting", true) { }
 };
 
 BEGIN_TRIGGER(HunterPetNotHappy, Trigger)
@@ -143,4 +150,15 @@ class SwitchToMeleeTrigger : public Trigger
         bool IsActive() override;
 };
 
+class MisdirectionOnMainTankTrigger : public BuffOnMainTankTrigger
+{
+    public:
+        MisdirectionOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "misdirection", true) {}
+};
+
+class TargetRemoveEnrageTrigger : public TargetAuraDispelTrigger
+{
+    public:
+        TargetRemoveEnrageTrigger(PlayerbotAI* ai) : TargetAuraDispelTrigger(ai, "tranquilizing shot", DISPEL_ENRAGE) {}
+};
 #endif

@@ -31,11 +31,16 @@ bool CastTravelFormAction::isUseful()
 bool CastCasterFormAction::isUseful()
 {
     return botAI->HasAnyAuraOf(GetTarget(), "dire bear form", "bear form", "cat form", "travel form", "aquatic form",
-        "flight form", "swift flight form", "moonkin form", "tree of life", nullptr);
+        "flight form", "swift flight form", "moonkin form", nullptr);
 }
 
 bool CastCasterFormAction::Execute(Event event)
 {
     botAI->RemoveShapeshift();
     return true;
+}
+
+bool CastTreeFormAction::isUseful() {
+    return GetTarget() && 
+        CastSpellAction::isUseful() && !botAI->HasAura(33891, bot);
 }

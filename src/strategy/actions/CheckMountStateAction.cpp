@@ -46,21 +46,27 @@ bool CheckMountStateAction::Execute(Event event)
         if (!bot->GetGroup() || bot->GetGroup()->GetLeaderGUID() != master->GetGUID())
             return false;
 
-        bool farFromMaster = sServerFacade->GetDistance2d(bot, master) > sPlayerbotAIConfig->sightDistance;
+        // bool farFromMaster = sServerFacade->GetDistance2d(bot, master) > sPlayerbotAIConfig->sightDistance;
         if (master->IsMounted() && !bot->IsMounted() && noattackers)
         {
             return Mount();
         }
 
-        if (!bot->IsMounted() && (chasedistance || (farFromMaster && botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))) && !bot->IsInCombat() && !dps)
-            return Mount();
-
-        if (!bot->IsFlying() && ((!farFromMaster && !master->IsMounted()) || attackdistance) && bot->IsMounted())
+        if (!master->IsMounted() && bot->IsMounted())
         {
             WorldPacket emptyPacket;
             bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
             return true;
         }
+        // if (!bot->IsMounted() && (chasedistance || (farFromMaster && botAI->HasStrategy("follow", BOT_STATE_NON_COMBAT))) && !bot->IsInCombat() && !dps)
+        //     return Mount();
+
+        // if (!bot->IsFlying() && ((!farFromMaster && !master->IsMounted()) || attackdistance) && bot->IsMounted())
+        // {
+        //     WorldPacket emptyPacket;
+        //     bot->GetSession()->HandleCancelMountAuraOpcode(emptyPacket);
+        //     return true;
+        // }
 
         return false;
     }
@@ -79,20 +85,20 @@ bool CheckMountStateAction::Execute(Event event)
         return Mount();
     }
 
-    if (!bot->InBattleground())
-    {
-        if (AI_VALUE(GuidPosition, "rpg target"))
-        {
-            if (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "rpg target"), sPlayerbotAIConfig->farDistance) && noattackers && !dps && !enemy)
-                return Mount();
-        }
+    // if (!bot->InBattleground())
+    // {
+    //     if (AI_VALUE(GuidPosition, "rpg target"))
+    //     {
+    //         if (sServerFacade->IsDistanceGreaterThan(AI_VALUE2(float, "distance", "rpg target"), sPlayerbotAIConfig->farDistance) && noattackers && !dps && !enemy)
+    //             return Mount();
+    //     }
 
-        if (((!AI_VALUE(GuidVector, "possible rpg targets").empty()) && noattackers && !dps && !enemy) && urand(0, 100) > 50)
-            return Mount();
-    }
+    //     if (((!AI_VALUE(GuidVector, "possible rpg targets").empty()) && noattackers && !dps && !enemy) && urand(0, 100) > 50)
+    //         return Mount();
+    // }
 
-    if (!bot->IsMounted() && !attackdistance && (fartarget || chasedistance))
-        return Mount();
+    // if (!bot->IsMounted() && !attackdistance && (fartarget || chasedistance))
+    //     return Mount();
 
     if (!bot->IsFlying() && attackdistance && bot->IsMounted() && (enemy || dps || (!noattackers && bot->IsInCombat())))
     {
@@ -163,7 +169,7 @@ bool CheckMountStateAction::Mount()
 
 	Player* master = GetMaster();
 	botAI->RemoveShapeshift();
-
+    botAI->RemoveAura("tree of life");
     int32 masterSpeed = 59;
     SpellInfo const* masterSpell = nullptr;
 

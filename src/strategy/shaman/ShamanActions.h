@@ -378,7 +378,7 @@ class CastLavaBurstAction : public CastSpellAction
 class CastEarthShieldOnMainTankAction : public BuffOnMainTankAction
 {
 	public:
-		CastEarthShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "earth shield", true) {}
+		CastEarthShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "earth shield", false) {}
 };
 
 class CastTotemOfWrathAction : public CastTotemAction
@@ -401,5 +401,11 @@ class CastWrathOfAirTotemAction : public CastTotemAction
 {
 	public:
 		CastWrathOfAirTotemAction(PlayerbotAI* ai) : CastTotemAction(ai, "wrath of air totem") {}
+};
+
+class CastShamanisticRageAction : public CastBuffSpellAction
+{
+	public:
+		CastShamanisticRageAction(PlayerbotAI* ai) : CastBuffSpellAction(ai, "shamanistic rage") {}
 };
 #endif

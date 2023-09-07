@@ -75,6 +75,7 @@ class CastRebirthAction : public ResurrectPartyMemberAction
 		CastRebirthAction(PlayerbotAI* botAI) : ResurrectPartyMemberAction(botAI, "rebirth") { }
 
         NextAction** getPrerequisites() override;
+		bool isUseful() override;
 };
 
 class CastMarkOfTheWildAction : public CastBuffSpellAction
@@ -105,6 +106,12 @@ class CastThornsOnPartyAction : public BuffOnPartyAction
 {
     public:
         CastThornsOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "thorns") { }
+};
+
+class CastThornsOnMainTankAction : public BuffOnMainTankAction
+{
+    public:
+        CastThornsOnMainTankAction(PlayerbotAI* botAI) : BuffOnMainTankAction(botAI, "thorns", false) { }
 };
 
 class CastOmenOfClarityAction : public CastBuffSpellAction
@@ -258,5 +265,17 @@ class CastDruidRemoveCurseOnPartyAction : public CurePartyMemberAction
 {
     public:
         CastDruidRemoveCurseOnPartyAction(PlayerbotAI* ai) : CurePartyMemberAction(ai, "remove curse", DISPEL_CURSE) {}
+};
+
+class CastInsectSwarmOnAttackerAction : public CastDebuffSpellOnAttackerAction
+{
+public:
+	CastInsectSwarmOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "insect swarm") {}
+};
+
+class CastMoonfireOnAttackerAction : public CastDebuffSpellOnAttackerAction
+{
+public:
+	CastMoonfireOnAttackerAction(PlayerbotAI* ai) : CastDebuffSpellOnAttackerAction(ai, "moonfire") {}
 };
 #endif

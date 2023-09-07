@@ -19,6 +19,7 @@ BUFF_ACTION(CastSealOfLightAction, "seal of light");
 BUFF_ACTION(CastSealOfWisdomAction, "seal of wisdom");
 BUFF_ACTION(CastSealOfCommandAction, "seal of command");
 BUFF_ACTION(CastSealOfVengeanceAction, "seal of vengeance");
+BUFF_ACTION(CastSealOfCorruptionAction, "seal of corruption");
 
 // judgements
 SPELL_ACTION(CastJudgementAction, "judgement");
@@ -90,17 +91,21 @@ class CastBlessingOfMightAction : public CastBuffSpellAction
 class CastBlessingOnPartyAction : public BuffOnPartyAction
 {
     public:
-	    CastBlessingOnPartyAction(PlayerbotAI* botAI, std::string const name) : BuffOnPartyAction(botAI, name) { }
+	    CastBlessingOnPartyAction(PlayerbotAI* botAI, std::string const name) : BuffOnPartyAction(botAI, name), name(name) { }
 
         Value<Unit*>* GetTargetValue() override;
+
+	private:
+		std::string name;
 };
 
-class CastBlessingOfMightOnPartyAction : public CastBlessingOnPartyAction
+class CastBlessingOfMightOnPartyAction : public BuffOnPartyAction
 {
 	public:
-		CastBlessingOfMightOnPartyAction(PlayerbotAI* botAI) : CastBlessingOnPartyAction(botAI, "blessing of might") { }
+		CastBlessingOfMightOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "blessing of might") { }
 
         std::string const getName() override { return "blessing of might on party";}
+		Value<Unit*>* GetTargetValue() override;
         bool Execute(Event event) override;
 };
 
@@ -112,12 +117,13 @@ class CastBlessingOfWisdomAction : public CastBuffSpellAction
 		bool Execute(Event event) override;
 };
 
-class CastBlessingOfWisdomOnPartyAction : public CastBlessingOnPartyAction
+class CastBlessingOfWisdomOnPartyAction : public BuffOnPartyAction
 {
 	public:
-		CastBlessingOfWisdomOnPartyAction(PlayerbotAI* botAI) : CastBlessingOnPartyAction(botAI, "blessing of wisdom") { }
+		CastBlessingOfWisdomOnPartyAction(PlayerbotAI* botAI) : BuffOnPartyAction(botAI, "blessing of wisdom") { }
 
         std::string const getName() override { return "blessing of wisdom on party";}
+		Value<Unit*>* GetTargetValue() override;
         bool Execute(Event event) override;
 };
 
@@ -368,5 +374,11 @@ class CastSacredShieldOnMainTankAction : public BuffOnMainTankAction
 {
 public:
 	CastSacredShieldOnMainTankAction(PlayerbotAI* ai) : BuffOnMainTankAction(ai, "sacred shield", false) {}
+};
+
+class CastAvengingWrathAction : public CastBuffSpellAction
+{
+	public:
+		CastAvengingWrathAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "avenging wrath") {}
 };
 #endif

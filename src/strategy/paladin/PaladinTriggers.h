@@ -6,9 +6,37 @@
 #define _PLAYERBOT_PALADINTRIGGERS_H
 
 #include "CureTriggers.h"
+#include "GenericTriggers.h"
 #include "SharedDefines.h"
+#include "Unit.h"
 
 class PlayerbotAI;
+
+inline std::string const GetActualBlessingOfMight(Unit* target)
+{
+    switch (target->getClass())
+    {
+        case CLASS_MAGE:
+        case CLASS_PRIEST:
+        case CLASS_WARLOCK:
+            return "blessing of wisdom";
+    }
+
+    return "blessing of might";
+}
+
+inline std::string const GetActualBlessingOfWisdom(Unit* target)
+{
+    switch (target->getClass())
+    {
+        case CLASS_WARRIOR:
+        case CLASS_ROGUE:
+        case CLASS_DEATH_KNIGHT:
+            return "blessing of might";
+    }
+
+    return "blessing of wisdom";
+}
 
 BUFF_TRIGGER(HolyShieldTrigger, "holy shield");
 BUFF_TRIGGER(RighteousFuryTrigger, "righteous fury");
@@ -27,7 +55,7 @@ class CrusaderAuraTrigger : public BuffTrigger
 class SealTrigger : public BuffTrigger
 {
 	public:
-		SealTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "seal of justice") { }
+		SealTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "seal") { }
 
 		bool IsActive() override;
 };
@@ -48,13 +76,13 @@ INTERRUPT_TRIGGER(RepentanceInterruptTrigger, "repentance");
 class BlessingOnPartyTrigger : public BuffOnPartyTrigger
 {
     public:
-        BlessingOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings,blessing of might,blessing of wisdom", 2) { }
+        BlessingOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings,blessing of might,blessing of wisdom", 2 * 2000) { }
 };
 
 class BlessingTrigger : public BuffTrigger
 {
     public:
-        BlessingTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of sanctuary", 2) { }
+        BlessingTrigger(PlayerbotAI* botAI) : BuffTrigger(botAI, "blessing of sanctuary", 2 * 2000) { }
 
         bool IsActive() override;
 };
@@ -170,5 +198,29 @@ class SacredShieldOnMainTankTrigger : public BuffOnMainTankTrigger
 {
 public:
     SacredShieldOnMainTankTrigger(PlayerbotAI* ai) : BuffOnMainTankTrigger(ai, "sacred shield", false) {}
+};
+
+class BlessingOfKingsOnPartyTrigger : public BuffOnPartyTrigger
+{
+    public:
+        BlessingOfKingsOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of kings", 2 * 2000) { }
+};
+
+class BlessingOfWisdomOnPartyTrigger : public BuffOnPartyTrigger
+{
+    public:
+        BlessingOfWisdomOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2 * 2000) { }
+};
+
+class BlessingOfMightOnPartyTrigger : public BuffOnPartyTrigger
+{
+    public:
+        BlessingOfMightOnPartyTrigger(PlayerbotAI* botAI) : BuffOnPartyTrigger(botAI, "blessing of might,blessing of wisdom", 2 * 2000) { }
+};
+
+class AvengingWrathTrigger : public BoostTrigger
+{
+    public:
+        AvengingWrathTrigger(PlayerbotAI* botAI) : BoostTrigger(botAI, "avenging wrath") {}
 };
 #endif

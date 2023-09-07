@@ -20,23 +20,23 @@ void HealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPriestStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode(
-        "enemy out of spell",
-        NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), NULL)));
+    // triggers.push_back(new TriggerNode(
+    //     "enemy out of spell",
+    //     NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), NULL)));
 
-	triggers.push_back(new TriggerNode(
-		"medium aoe heal",
-		NextAction::array(0, 
-            new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8), 
-            new NextAction("power word: shield on almost full health below", ACTION_MEDIUM_HEAL + 7),
-            new NextAction("prayer of healing on party", ACTION_MEDIUM_HEAL + 6),
-            NULL)));
+	// triggers.push_back(new TriggerNode(
+	// 	"medium aoe heal",
+	// 	NextAction::array(0, 
+    //         new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8), 
+    //         // new NextAction("power word: shield on almost full health below", ACTION_MEDIUM_HEAL + 7),
+    //         NULL)));
 
     triggers.push_back(new TriggerNode(
 		"group heal occasion",
         NextAction::array(0, 
             new NextAction("circle of healing", ACTION_MEDIUM_HEAL + 8), 
             new NextAction("power word: shield on almost full health below", ACTION_MEDIUM_HEAL + 7),
+            new NextAction("prayer of healing on party", ACTION_MEDIUM_HEAL + 6),
             NULL)));
 
     triggers.push_back(new TriggerNode(
@@ -80,10 +80,10 @@ void HealPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     // triggers.push_back(new TriggerNode("party member almost full health", NextAction::array(0, new NextAction("heal on party", 41.0f), new NextAction("renew on party", 40.0f), nullptr)));
     // triggers.push_back(new TriggerNode("party member medium health", NextAction::array(0, new NextAction("greater heal on party", 47.0f), nullptr)));
     // triggers.push_back(new TriggerNode("party member low health", NextAction::array(0, new NextAction("power word: shield on party", 51.0f), new NextAction("greater heal on party", 50.0f), nullptr)));
-    triggers.push_back(new TriggerNode("party member to heal out of spell range", NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL), nullptr)));
+    triggers.push_back(new TriggerNode("party member to heal out of spell range", NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 10), nullptr)));
     // triggers.push_back(new TriggerNode("medium aoe heal", NextAction::array(0, new NextAction("prayer of mending", 49.0f), nullptr)));
     // triggers.push_back(new TriggerNode("medium aoe heal", NextAction::array(0, new NextAction("circle of healing", 48.0f), nullptr)));
-    triggers.push_back(new TriggerNode("binding heal", NextAction::array(0, new NextAction("binding heal", 52.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("binding heal", NextAction::array(0, new NextAction("binding heal", 52.0f), nullptr)));
     // triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("shadowfiend", ACTION_HIGH), nullptr)));
 
     triggers.push_back(new TriggerNode("critical health", NextAction::array(0, new NextAction("pain suppression", ACTION_EMERGENCY + 1), nullptr)));

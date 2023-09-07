@@ -164,12 +164,14 @@ class RandomItemMgr
         float GetItemRarity(uint32 itemId);
         uint32 GetQuestIdForItem(uint32 itemId);
         std::vector<uint32> GetQuestIdsForItem(uint32 itemId);
-
         static bool IsUsedBySkill(ItemTemplate const* proto, uint32 skillId);
+        bool IsTestItem(uint32 itemId) { return itemForTest.find(itemId) != itemForTest.end(); }
+        std::vector<uint32> GetCachedEquipments(uint32 requiredLevel, uint32 inventoryType);
 
     private:
         void BuildRandomItemCache();
         void BuildEquipCache();
+        void BuildEquipCacheNew();
         void BuildItemInfoCache();
         void BuildAmmoCache();
         void BuildFoodCache();
@@ -180,7 +182,6 @@ class RandomItemMgr
         bool CanEquipItemNew(ItemTemplate const* proto);
         void AddItemStats(uint32 mod, uint8& sp, uint8& ap, uint8& tank);
         bool CheckItemStats(uint8 clazz, uint8 sp, uint8 ap, uint8 tank);
-
     private:
         std::map<uint32, RandomItemCache> randomItemCache;
         std::map<RandomItemType, RandomItemPredicate*> predicates;
@@ -195,8 +196,10 @@ class RandomItemMgr
         std::map<std::string, uint32 > weightStatLink;
         std::map<std::string, uint32 > weightRatingLink;
         std::map<uint32, ItemInfoEntry> itemInfoCache;
-
+        std::set<uint32> itemForTest;
         static std::set<uint32> itemCache;
+        // equipCacheNew[RequiredLevel][InventoryType]
+        std::map<uint32, std::map<uint32, std::vector<uint32>>> equipCacheNew;
 };
 
 #define sRandomItemMgr RandomItemMgr::instance()

@@ -37,8 +37,8 @@ NextAction** DpsHunterStrategy::getDefaultActions()
         new NextAction("aimed shot", 14.0f), 
         new NextAction("arcane shot", 13.0f),
         new NextAction("steady shot", 12.0f),
-        new NextAction("auto shot", 10.0f), 
-        NULL);
+        new NextAction("auto shot", 10.0f),
+        nullptr);
     // return NextAction::array(0, new NextAction("explosive shot", 11.0f), new NextAction("auto shot", 10.0f), new NextAction("auto attack", 9.0f), nullptr);
 }
 
@@ -47,8 +47,8 @@ void DpsHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     GenericHunterStrategy::InitTriggers(triggers);
 
     triggers.push_back(new TriggerNode("black arrow", NextAction::array(0, new NextAction("black arrow", 15.0f), nullptr)));
-    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("viper sting", 23), nullptr)));
-    triggers.push_back(new TriggerNode("hunter's mark", NextAction::array(0, new NextAction("hunter's mark", 19.0f), nullptr)));
+    triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("viper sting", 23.0f), nullptr)));
+    triggers.push_back(new TriggerNode("hunter's mark", NextAction::array(0, new NextAction("hunter's mark", 11.0f), nullptr)));
     triggers.push_back(new TriggerNode("concussive shot on snare target", NextAction::array(0, new NextAction("concussive shot", 20.0f), nullptr)));
     triggers.push_back(new TriggerNode("no pet", NextAction::array(0, new NextAction("call pet", 21.0f), NULL)));
     triggers.push_back(new TriggerNode("hunters pet low health", NextAction::array(0, new NextAction("mend pet", 21.0f), NULL)));
@@ -58,7 +58,7 @@ void DpsHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void DpsAoeHunterStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("multi-shot", 20.0f), nullptr)));
-	triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("volley", 20.0f), nullptr)));
+	triggers.push_back(new TriggerNode("medium aoe", NextAction::array(0, new NextAction("volley", 21.0f), nullptr)));
 	triggers.push_back(new TriggerNode("serpent sting on attacker", NextAction::array(0, new NextAction("serpent sting on attacker", 17.0f), nullptr)));
 }
 

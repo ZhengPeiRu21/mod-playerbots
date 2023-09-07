@@ -18,7 +18,7 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 		    //creators["death grip"] = &death_grip;
 		    //creators["plague strike"] = &plague_strike;
 		    //creators["pestilence"] = &pestilence;
-		    //creators["icy touch"] = &icy_touch;
+		    creators["icy touch"] = &icy_touch;
 		    //creators["obliterate"] = &obliterate;
 		    //creators["blood boil"] = &blood_boil;
 		    //creators["mark of_blood"] = &mark_of_blood;
@@ -41,7 +41,13 @@ class BloodDKStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 			    /*A*/ nullptr,
 			    /*C*/ nullptr);
 	    }
-
+		static ActionNode* icy_touch([[maybe_unused]] PlayerbotAI* botAI)
+	    {
+		    return new ActionNode("icy touch",
+			    /*P*/ NextAction::array(0, new NextAction("frost presence"), nullptr),
+			    /*A*/ nullptr,
+			    /*C*/ nullptr);
+	    }
 	    static ActionNode* heart_strike([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode ("heart strike",
@@ -77,9 +83,9 @@ NextAction** BloodDKStrategy::getDefaultActions()
 		new NextAction("rune strike", ACTION_NORMAL + 7), 
 		new NextAction("icy touch", ACTION_NORMAL + 6),
 		new NextAction("heart strike", ACTION_NORMAL + 5),
-		new NextAction("death coil", ACTION_NORMAL + 4),
-		new NextAction("plague strike", ACTION_NORMAL + 3),
-		new NextAction("blood strike", ACTION_NORMAL + 2),
+		new NextAction("blood strike", ACTION_NORMAL + 4),
+		new NextAction("death coil", ACTION_NORMAL + 3),
+		new NextAction("plague strike", ACTION_NORMAL + 2),
 		new NextAction("melee", ACTION_NORMAL), 
 		NULL);
 }
@@ -93,4 +99,5 @@ void BloodDKStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode("lose aggro", NextAction::array(0, new NextAction("dark command", ACTION_HIGH + 3), nullptr)));
     triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("blood tap", ACTION_HIGH + 5),
         new NextAction("vampiric blood", ACTION_HIGH + 3), new NextAction("death strike", ACTION_HIGH + 4), nullptr)));
+	
 }

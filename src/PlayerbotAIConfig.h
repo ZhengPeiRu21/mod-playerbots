@@ -66,6 +66,7 @@ class PlayerbotAIConfig
         uint32 minRandomBotRandomizeTime, maxRandomBotRandomizeTime;
         uint32 minRandomBotChangeStrategyTime, maxRandomBotChangeStrategyTime;
         uint32 minRandomBotReviveTime, maxRandomBotReviveTime;
+        uint32 minRandomBotTeleportInterval, maxRandomBotTeleportInterval;
         uint32 minRandomBotPvpTime, maxRandomBotPvpTime;
         uint32 randomBotsPerInterval;
         uint32 minRandomBotsPriceChangeInterval, maxRandomBotsPriceChangeInterval;
@@ -75,7 +76,7 @@ class PlayerbotAIConfig
         bool randomBotJoinBG;
         bool randomBotAutoJoinBG;
         bool randomBotLoginAtStartup;
-        uint32 randomBotTeleLevel;
+        uint32 randomBotTeleLowerLevel, randomBotTeleHigherLevel;
         bool logInGroupOnly, logValuesPerTick;
         bool fleeingEnabled;
         bool summonAtInnkeepersEnabled;
@@ -142,17 +143,20 @@ class PlayerbotAIConfig
         uint32 playerbotsXPrate;
         uint32 botActiveAlone;
 
+        bool freeMethodLoot;
         std::string autoPickReward;
         bool autoEquipUpgradeLoot;
         bool syncQuestWithPlayer;
         bool syncQuestForPlayer;
         std::string autoTrainSpells;
-        std::string autoPickTalents;
+        bool autoPickTalents;
+        bool autoUpgradeEquip;
         bool autoLearnTrainerSpells;
         bool autoDoQuests;
         bool syncLevelWithPlayers;
         bool freeFood;
         bool autoLearnQuestSpells;
+        bool autoTeleportForLevel;
         bool randomBotSayWithoutMaster;
         bool randomBotGroupNearby;
         uint32 tweakValue; //Debugging config
@@ -162,7 +166,7 @@ class PlayerbotAIConfig
         std::vector<uint32> randomBotArenaTeams;
 
         uint32 selfBotLevel;
-
+        bool downgradeMaxLevelBot;
         std::string const GetTimestampStr();
         bool hasLog(std::string const fileName) { return std::find(allowedLogFiles.begin(), allowedLogFiles.end(), fileName) != allowedLogFiles.end(); };
         bool openLog(std::string const fileName, char const* mode = "a");

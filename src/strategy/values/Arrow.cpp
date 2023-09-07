@@ -3,6 +3,7 @@
  */
 
 #include "Arrow.h"
+#include "Map.h"
 #include "Playerbots.h"
 
 WorldLocation ArrowFormation::GetLocationInternal()
@@ -28,11 +29,11 @@ WorldLocation ArrowFormation::GetLocationInternal()
     tanks.PlaceUnits(&placer);
     tanks.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
-    offset += tankLines * sPlayerbotAIConfig->followDistance;
+    offset += tankLines * sPlayerbotAIConfig->followDistance + sPlayerbotAIConfig->tooCloseDistance / 2;
     melee.PlaceUnits(&placer);
     melee.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
-    offset += meleeLines * sPlayerbotAIConfig->followDistance + sPlayerbotAIConfig->tooCloseDistance;
+    offset += meleeLines * sPlayerbotAIConfig->followDistance + sPlayerbotAIConfig->tooCloseDistance / 2;
     ranged.PlaceUnits(&placer);
     ranged.Move(-cos(orientation) * offset, -sin(orientation) * offset);
 
@@ -43,12 +44,12 @@ WorldLocation ArrowFormation::GetLocationInternal()
     float x = master->GetPositionX() - masterUnit->GetX() + botUnit->GetX();
     float y = master->GetPositionY() - masterUnit->GetY() + botUnit->GetY();
     float z = master->GetPositionZ();
-
-    float ground = master->GetMap()->GetHeight(x, y, z + 0.5f);
+    
+    float ground = master->GetMap()->GetHeight(x, y, z + 30.0f);
     if (ground <= INVALID_HEIGHT)
         return Formation::NullLocation;
-
-    return WorldLocation(master->GetMapId(), x, y, 0.05f + ground);
+    // master->UpdateGroundPositionZ(x, y, z);
+    return WorldLocation(master->GetMapId(), x, y, z);
 }
 
 void ArrowFormation::Build()

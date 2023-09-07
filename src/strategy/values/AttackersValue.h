@@ -16,16 +16,16 @@ class Unit;
 class AttackersValue : public ObjectGuidListCalculatedValue
 {
 	public:
-        AttackersValue(PlayerbotAI* botAI) : ObjectGuidListCalculatedValue(botAI, "attackers", 1) { }
+        AttackersValue(PlayerbotAI* botAI) : ObjectGuidListCalculatedValue(botAI, "attackers", 1 * 1000) { }
 
         GuidVector Calculate();
         static bool IsPossibleTarget(Unit* attacker, Player* bot, float range = sPlayerbotAIConfig->sightDistance);
         static bool IsValidTarget(Unit* attacker, Player* bot);
 
 	private:
-        void AddAttackersOf(Group* group, std::set<Unit*>& targets);
-        void AddAttackersOf(Player* player, std::set<Unit*>& targets);
-        void RemoveNonThreating(std::set<Unit*>& targets);
+        void AddAttackersOf(Group* group, std::unordered_set<Unit*>& targets);
+        void AddAttackersOf(Player* player, std::unordered_set<Unit*>& targets);
+        void RemoveNonThreating(std::unordered_set<Unit*>& targets);
         bool hasRealThreat(Unit* attacker);
 };
 

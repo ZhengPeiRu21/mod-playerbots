@@ -3,6 +3,7 @@
  */
 
 #include "RandomItemMgr.h"
+#include "ItemTemplate.h"
 #include "LootValues.h"
 #include "Playerbots.h"
 
@@ -153,6 +154,7 @@ void RandomItemMgr::Init()
 {
     BuildItemInfoCache();
     // BuildEquipCache();
+    BuildEquipCacheNew();
     BuildAmmoCache();
     BuildPotionCache();
     BuildFoodCache();
@@ -438,6 +440,11 @@ bool RandomItemMgr::CheckItemStats(uint8 clazz, uint8 sp, uint8 ap, uint8 tank)
     }
 
     return sp || ap || tank;
+}
+
+std::vector<uint32> RandomItemMgr::GetCachedEquipments(uint32 requiredLevel, uint32 inventoryType)
+{
+    return equipCacheNew[requiredLevel][inventoryType];
 }
 
 bool RandomItemMgr::ShouldEquipArmorForSpec(uint8 playerclass, uint8 spec, ItemTemplate const* proto)
@@ -945,9 +952,16 @@ void RandomItemMgr::BuildItemInfoCache()
             strstr(proto->Name1.c_str(), "Monster ") ||
             strstr(proto->Name1.c_str(), "[PH]") ||
             strstr(proto->Name1.c_str(), "(OLD)")
-            )
+            ) 
+        {
+            itemForTest.insert(proto->ItemId);
             continue;
+        }
 
+        if (proto->Flags & ITEM_FLAG_DEPRECATED) {
+            itemForTest.insert(proto->ItemId);
+            continue;
+        }
         // skip items with rank/rep requirements
         /*if (proto->RequiredHonorRank > 0 ||
             proto->RequiredSkillRank > 0 ||
@@ -2131,6 +2145,23 @@ void RandomItemMgr::BuildEquipCache()
     }
 }
 
+void RandomItemMgr::BuildEquipCacheNew()
+{
+    LOG_INFO("playerbots", "Loading equipments cache...");
+    ItemTemplateContainer const* itemTemplates = sObjectMgr->GetItemTemplateStore();
+    for (auto const& itr : *itemTemplates)
+    {
+        ItemTemplate const* proto = &itr.second;
+        if (!proto)
+            continue;
+        uint32 itemId = proto->ItemId;
+        if (IsTestItem(itemId)) {
+            continue;
+        }
+        equipCacheNew[proto->RequiredLevel][proto->InventoryType].push_back(itemId);
+    }
+}
+
 RandomItemList RandomItemMgr::Query(uint32 level, uint8 clazz, uint8 slot, uint32 quality)
 {
     // return equipCache[key];
@@ -2178,15 +2209,21 @@ void RandomItemMgr::BuildAmmoCache()
     {
         for (uint32 subClass = ITEM_SUBCLASS_ARROW; subClass <= ITEM_SUBCLASS_BULLET; subClass++)
         {
-            QueryResult results = WorldDatabase.Query("SELECT entry FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} "
+            QueryResult results = WorldDatabase.Query("SELECT entry, Flags FROM item_template WHERE class = {} AND subclass = {} AND RequiredLevel <= {} AND stackable = 1000 "
                 "ORDER BY RequiredLevel DESC", ITEM_CLASS_PROJECTILE, subClass, level);
             if (!results)
-                return;
-
-            Field* fields = results->Fetch();
-            uint32 entry = fields[0].Get<uint32>();
-            ammoCache[level][subClass] = entry;
-            ++counter;
+                continue;
+            do {
+                Field* fields = results->Fetch();
+                uint32 entry = fields[0].Get<uint32>();
+                uint32 flags = fields[1].Get<uint32>();
+                if (flags & ITEM_FLAG_DEPRECATED) {
+                    continue;
+                }
+                ammoCache[level][subClass] = entry;
+                ++counter;
+                break;
+            } while (results->NextRow());
         }
     }
 

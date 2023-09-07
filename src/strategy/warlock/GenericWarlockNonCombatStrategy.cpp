@@ -42,28 +42,25 @@ class GenericWarlockNonCombatStrategyActionNodeFactory : public NamedObjectFacto
                 /*A*/ NextAction::array(0, new NextAction("summon imp"), nullptr),
                 /*C*/ nullptr);
         }
-
+        static ActionNode* summon_succubus(PlayerbotAI* botAI)
+        {
+            return new ActionNode("summon succubus",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("summon imp"), nullptr),
+                /*C*/ nullptr);
+        }
+        static ActionNode* summon_felhunter([[maybe_unused]] PlayerbotAI* botAI)
+        {
+            return new ActionNode("summon felhunter",
+                /*P*/ nullptr,
+                /*A*/ NextAction::array(0, new NextAction("summon succubus"), nullptr),
+                /*C*/ nullptr);
+        }
         static ActionNode* summon_felguard([[maybe_unused]] PlayerbotAI* botAI)
         {
             return new ActionNode("summon felguard",
                 /*P*/ nullptr,
                 /*A*/ NextAction::array(0, new NextAction("summon succubus"), nullptr),
-                /*C*/ nullptr);
-        }
-
-        static ActionNode* summon_succubus(PlayerbotAI* botAI)
-        {
-            return new ActionNode("summon succubus",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("summon voidwalker"), nullptr),
-                /*C*/ nullptr);
-        }
-
-        static ActionNode* summon_felhunter([[maybe_unused]] PlayerbotAI* botAI)
-        {
-            return new ActionNode("summon felhunter",
-                /*P*/ nullptr,
-                /*A*/ NextAction::array(0, new NextAction("summon imp"), nullptr),
                 /*C*/ nullptr);
         }
 };
@@ -79,6 +76,7 @@ void GenericWarlockNonCombatStrategy::InitTriggers(std::vector<TriggerNode*>& tr
 
     triggers.push_back(new TriggerNode("demon armor", NextAction::array(0, new NextAction("fel armor", 21.0f), nullptr)));
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
+    triggers.push_back(new TriggerNode("has pet", NextAction::array(0, new NextAction("toggle pet spell", 60.0f), nullptr)));
 }
 
 void WarlockPetStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

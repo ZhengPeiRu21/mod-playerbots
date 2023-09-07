@@ -11,14 +11,20 @@
 class PlayerbotAI;
 class Unit;
 
-BEGIN_RANGED_SPELL_ACTION(CastHuntersMarkAction, "hunter's mark")
-END_SPELL_ACTION()
+// BEGIN_RANGED_SPELL_ACTION(CastHuntersMarkAction, "hunter's mark")
+// END_SPELL_ACTION()
 
+class CastHuntersMarkAction : public CastDebuffSpellAction
+{
+    public:
+        CastHuntersMarkAction(PlayerbotAI* botAI) : CastDebuffSpellAction(botAI, "hunter's mark") { }
+        bool isUseful() override;
+};
 class CastAutoShotAction : public CastSpellAction
 {
     public:
         CastAutoShotAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "auto shot") { }
-
+        ActionThreatType getThreatType() override { return ActionThreatType::None; }
         bool isUseful() override;
 };
 

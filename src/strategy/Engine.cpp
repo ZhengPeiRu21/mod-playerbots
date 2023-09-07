@@ -261,7 +261,8 @@ bool Engine::DoNextAction(Unit* unit, uint32 depth, bool minimal)
         lastRelevance = 0.0f;
         PushDefaultActions();
 
-        if (queue.Peek() && depth < 2)
+        // prevent the delay after pushing default actions
+        if (queue.Peek() && depth < 1 && !minimal)
             return DoNextAction(unit, depth + 1, minimal);
     }
 
@@ -458,7 +459,7 @@ bool Engine::HasStrategy(std::string const name)
 
 void Engine::ProcessTriggers(bool minimal)
 {
-    std::map<Trigger*, Event> fires;
+    std::unordered_map<Trigger*, Event> fires;
     for (std::vector<TriggerNode*>::iterator i = triggers.begin(); i != triggers.end(); i++)
     {
         TriggerNode* node = *i;
@@ -614,6 +615,10 @@ bool Engine::ListenAndExecute(Action* action, Event event)
 
 void Engine::LogAction(char const* format, ...)
 {
+    Player* bot = botAI->GetBot();
+    if (sPlayerbotAIConfig->logInGroupOnly && (!bot->GetGroup() || !botAI->HasRealPlayerMaster()) && !testMode)
+        return;
+
     char buf[1024];
 
     va_list ap;
@@ -633,16 +638,12 @@ void Engine::LogAction(char const* format, ...)
     if (testMode)
     {
         FILE* file = fopen("test.log", "a");
-        fprintf(file, "'{}'", buf);
+        fprintf(file, "'%s'", buf);
         fprintf(file, "\n");
         fclose(file);
     }
     else
     {
-        Player* bot = botAI->GetBot();
-        if (sPlayerbotAIConfig->logInGroupOnly && !bot->GetGroup())
-            return;
-
         LOG_DEBUG("playerbots",  "{} {}", bot->GetName().c_str(), buf);
     }
 }
@@ -677,7 +678,7 @@ void Engine::LogValues()
         return;
 
     Player* bot = botAI->GetBot();
-    if (sPlayerbotAIConfig->logInGroupOnly && !bot->GetGroup())
+    if (sPlayerbotAIConfig->logInGroupOnly && (!bot->GetGroup() || !botAI->HasRealPlayerMaster()))
         return;
 
     std::string const text = botAI->GetAiObjectContext()->FormatValues();

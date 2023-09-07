@@ -25,6 +25,7 @@
 #include "DistanceValue.h"
 #include "EnemyHealerTargetValue.h"
 #include "EnemyPlayerValue.h"
+#include "ExpectedLifetimeValue.h"
 #include "Formations.h"
 #include "GroupValues.h"
 #include "GrindTargetValue.h"
@@ -85,6 +86,7 @@
 #include "TankTargetValue.h"
 #include "ThreatValues.h"
 #include "TradeValues.h"
+#include "Value.h"
 
 class PlayerbotAI;
 
@@ -115,6 +117,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["log level"] = &ValueContext::log_level;
             creators["party member without aura"] = &ValueContext::party_member_without_aura;
             creators["attacker without aura"] = &ValueContext::attacker_without_aura;
+            creators["melee attacker without aura"] = &ValueContext::melee_attacker_without_aura;
             creators["party member to heal"] = &ValueContext::party_member_to_heal;
             creators["party member to resurrect"] = &ValueContext::party_member_to_resurrect;
             creators["current target"] = &ValueContext::current_target;
@@ -289,6 +292,10 @@ class ValueContext : public NamedObjectContext<UntypedValue>
             creators["main tank"] = &ValueContext::main_tank;
             creators["find target"] = &ValueContext::find_target;
             creators["boss target"] = &ValueContext::boss_target;
+            creators["nearest triggers"] = &ValueContext::nearest_triggers;
+            creators["neglect threat"] = &ValueContext::neglect_threat;
+            creators["expected lifetime"] =  &ValueContext::expected_lifetime;
+            creators["expected group dps"] =  &ValueContext::expected_group_dps;
         }
 
     private:
@@ -373,6 +380,7 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* nearest_adds(PlayerbotAI* botAI) { return new NearestAddsValue(botAI); }
         static UntypedValue* party_member_without_aura(PlayerbotAI* botAI) { return new PartyMemberWithoutAuraValue(botAI); }
         static UntypedValue* attacker_without_aura(PlayerbotAI* botAI) { return new AttackerWithoutAuraTargetValue(botAI); }
+        static UntypedValue* melee_attacker_without_aura(PlayerbotAI* botAI) { return new MeleeAttackerWithoutAuraTargetValue(botAI); }
         static UntypedValue* party_member_to_heal(PlayerbotAI* botAI) { return new PartyMemberToHeal(botAI); }
         static UntypedValue* party_member_to_resurrect(PlayerbotAI* botAI) { return new PartyMemberToResurrect(botAI); }
         static UntypedValue* party_member_to_dispel(PlayerbotAI* botAI) { return new PartyMemberToDispel(botAI); }
@@ -483,6 +491,11 @@ class ValueContext : public NamedObjectContext<UntypedValue>
         static UntypedValue* main_tank(PlayerbotAI* ai) { return new PartyMemberMainTankValue(ai); }
         static UntypedValue* find_target(PlayerbotAI* ai) { return new FindTargetValue(ai); }
         static UntypedValue* boss_target(PlayerbotAI* ai) { return new BossTargetValue(ai); }
+        static UntypedValue* nearest_triggers(PlayerbotAI* ai) { return new NearestTriggersValue(ai); }
+        static UntypedValue* neglect_threat(PlayerbotAI* ai) { return new NeglectThreatResetValue(ai); }
+        static UntypedValue* expected_lifetime(PlayerbotAI* ai) { return new ExpectedLifetimeValue(ai); }
+        static UntypedValue* expected_group_dps(PlayerbotAI* ai) { return new ExpectedGroupDpsValue(ai); }
+        
 };
 
 #endif

@@ -63,10 +63,10 @@ bool CastSpellAction::Execute(Event event)
 bool CastSpellAction::isPossible()
 {
     if (botAI->IsInVehicle() && !botAI->IsInVehicle(false, false, true)) {
-        if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-            LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", 
-                bot->GetName());
-        }
+        // if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+        //     LOG_DEBUG("playerbots", "Can cast spell failed. Vehicle. - bot name: {}", 
+        //         bot->GetName());
+        // }
         return false;
     }
 
@@ -75,10 +75,10 @@ bool CastSpellAction::isPossible()
 
     if (spell == "mount" && bot->IsInCombat())
     {
-        if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
-            LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", 
-                bot->GetName());
-        }
+        // if (!sPlayerbotAIConfig->logInGroupOnly || bot->GetGroup()) {
+        //     LOG_DEBUG("playerbots", "Can cast spell failed. Mount. - bot name: {}", 
+        //         bot->GetName());
+        // }
         bot->Dismount();
         return false;
     }
@@ -220,6 +220,11 @@ Value<Unit*>* CastDebuffSpellOnAttackerAction::GetTargetValue()
     return context->GetValue<Unit*>("attacker without aura", spell);
 }
 
+Value<Unit*>* CastDebuffSpellOnMeleeAttackerAction::GetTargetValue()
+{
+    return context->GetValue<Unit*>("melee attacker without aura", spell);
+}
+
 CastBuffSpellAction::CastBuffSpellAction(PlayerbotAI* botAI, std::string const spell, bool checkIsOwner) : CastAuraSpellAction(botAI, spell, checkIsOwner)
 {
     range = botAI->GetRange("spell");
@@ -287,3 +292,11 @@ Value<Unit*>* BuffOnMainTankAction::GetTargetValue()
     return context->GetValue<Unit*>("main tank", spell);
 }
 
+bool CastDebuffSpellAction::isUseful()
+{
+    Unit* target = GetTarget();
+    if (!target || !target->IsAlive() || !target->IsInWorld()) {
+        return false;
+    }
+    return CastAuraSpellAction::isUseful() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+}

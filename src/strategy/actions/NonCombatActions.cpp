@@ -17,8 +17,9 @@ bool DrinkAction::Execute(Event event)
 
     if (sPlayerbotAIConfig->freeFood)
     {
-        if (bot->IsNonMeleeSpellCast(true))
-            return false;
+        
+        // if (bot->IsNonMeleeSpellCast(true))
+        //     return false;
 
         bot->ClearUnitState(UNIT_STATE_CHASE);
         bot->ClearUnitState(UNIT_STATE_FOLLOW);
@@ -43,9 +44,10 @@ bool DrinkAction::Execute(Event event)
             delay = 20000.0f * (100 - p) / 100.0f;
 
         botAI->SetNextCheckDelay(delay);
-
-
-        return botAI->CastSpell(24707, bot);
+        
+        bot->AddAura(24707, bot);
+        return true;
+        // return botAI->CastSpell(24707, bot);
     }
 
     return UseItemAction::Execute(event);
@@ -58,7 +60,7 @@ bool DrinkAction::isUseful()
 
 bool DrinkAction::isPossible()
 {
-    return sPlayerbotAIConfig->freeFood || UseItemAction::isPossible();
+    return !bot->IsInCombat() && (sPlayerbotAIConfig->freeFood || UseItemAction::isPossible());
 }
 
 bool EatAction::Execute(Event event)
@@ -68,8 +70,8 @@ bool EatAction::Execute(Event event)
 
     if (sPlayerbotAIConfig->freeFood)
     {
-        if (bot->IsNonMeleeSpellCast(true))
-            return false;
+        // if (bot->IsNonMeleeSpellCast(true))
+        //     return false;
 
         bot->ClearUnitState(UNIT_STATE_CHASE);
         bot->ClearUnitState(UNIT_STATE_FOLLOW);
@@ -94,9 +96,9 @@ bool EatAction::Execute(Event event)
         else
             delay = 20000.0f * (100 - p) / 100.0f;
 
-        botAI->CastSpell(24707, bot);
         botAI->SetNextCheckDelay(delay);
-
+        
+        bot->AddAura(24707, bot);
         return true;
     }
 
@@ -104,11 +106,11 @@ bool EatAction::Execute(Event event)
 }
 
 bool EatAction::isUseful()
-{
-    return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < sPlayerbotAIConfig->lowHealth;
+{ 
+    return UseItemAction::isUseful() && AI_VALUE2(uint8, "health", "self target") < 85;
 }
 
 bool EatAction::isPossible()
 {
-    return sPlayerbotAIConfig->freeFood || UseItemAction::isPossible();
+    return !bot->IsInCombat() && (sPlayerbotAIConfig->freeFood || UseItemAction::isPossible());
 }

@@ -8,6 +8,7 @@
 #include "Playerbots.h"
 #include "SharedDefines.h"
 #include "TemporarySummon.h"
+#include "Timer.h"
 #include <string>
 
 bool LowManaTrigger::IsActive()
@@ -135,6 +136,11 @@ Value<Unit*>* DebuffOnAttackerTrigger::GetTargetValue()
 	return context->GetValue<Unit*>("attacker without aura", spell);
 }
 
+Value<Unit*>* DebuffOnMeleeAttackerTrigger::GetTargetValue()
+{
+	return context->GetValue<Unit*>("melee attacker without aura", spell);
+}
+
 bool NoAttackersTrigger::IsActive()
 {
     return !AI_VALUE(Unit*, "current target") && AI_VALUE(uint8, "my attacker count") > 0;
@@ -201,7 +207,20 @@ bool TargetInSightTrigger::IsActive()
 
 bool DebuffTrigger::IsActive()
 {
-	return BuffTrigger::IsActive() && AI_VALUE2(uint8, "health", GetTargetName()) > life_bound;
+    Unit* target = GetTarget();
+    if (!target || !target->IsAlive() || !target->IsInWorld()) {
+        return false;
+    }
+	return BuffTrigger::IsActive() && (target->GetHealth() / AI_VALUE(float, "expected group dps")) >= needLifeTime;
+}
+
+bool DebuffOnBossTrigger::IsActive()
+{
+    if (!DebuffTrigger::IsActive()) {
+        return false;
+    }
+    Creature *c = GetTarget()->ToCreature();
+    return c && ((c->IsDungeonBoss()) || (c->isWorldBoss()));
 }
 
 bool SpellTrigger::IsActive()
@@ -224,16 +243,25 @@ bool SpellNoCooldownTrigger::IsActive()
     return !bot->HasSpellCooldown(spellId);
 }
 
-RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 probability) : Trigger(botAI, name), probability(probability), lastCheck(time(nullptr))
+bool SpellCooldownTrigger::IsActive()
+{
+    uint32 spellId = AI_VALUE2(uint32, "spell id", name);
+    if (!spellId)
+        return false;
+    
+    return bot->HasSpellCooldown(spellId);
+}
+
+RandomTrigger::RandomTrigger(PlayerbotAI* botAI, std::string const name, int32 probability) : Trigger(botAI, name), probability(probability), lastCheck(getMSTime())
 {
 }
 
 bool RandomTrigger::IsActive()
 {
-    if (time(nullptr) - lastCheck < sPlayerbotAIConfig->repeatDelay / 1000)
+    if (getMSTime() - lastCheck < sPlayerbotAIConfig->repeatDelay)
         return false;
 
-    lastCheck = time(nullptr);
+    lastCheck = getMSTime();
     int32 k = (int32)(probability / sPlayerbotAIConfig->randomChangeMultiplier);
     if (k < 1)
         k = 1;

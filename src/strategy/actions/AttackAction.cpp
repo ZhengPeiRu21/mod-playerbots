@@ -104,24 +104,24 @@ bool AttackAction::Attack(Unit* target, bool with_pet /*true*/)
     
     if (Pet* pet = bot->GetPet())
     {
-        pet->SetReactState(REACT_PASSIVE);
         if (with_pet) {
+            pet->SetReactState(REACT_DEFENSIVE);
             pet->SetTarget(target->GetGUID());
-            pet->GetCharmInfo()->SetCommandState(COMMAND_ATTACK);
             pet->GetCharmInfo()->SetIsCommandAttack(true);
             pet->AI()->AttackStart(target);
+            // pet->SetReactState(REACT_DEFENSIVE);
         } else {
-            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+            pet->SetReactState(REACT_PASSIVE);
             pet->GetCharmInfo()->SetIsCommandFollow(true);
             pet->GetCharmInfo()->IsReturning();
-            pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
+            // pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
         }
     }
 
     if (IsMovingAllowed() && !bot->HasInArc(CAST_ANGLE_IN_FRONT, target))
         bot->SetFacingToObject(target);
 
-    bool attacked = bot->Attack(target, !botAI->IsRanged(bot));
+    bool attacked = bot->Attack(target, true);
     botAI->ChangeEngine(BOT_STATE_COMBAT);
 
     return attacked;

@@ -7,7 +7,7 @@
 #include "HealPriestStrategy.h"
 #include "Playerbots.h"
 
-GenericPriestStrategy::GenericPriestStrategy(PlayerbotAI* botAI) : CombatStrategy(botAI)
+GenericPriestStrategy::GenericPriestStrategy(PlayerbotAI* botAI) : RangedCombatStrategy(botAI)
 {
     actionNodeFactories.Add(new GenericPriestStrategyActionNodeFactory());
 }
@@ -44,9 +44,7 @@ void GenericPriestStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "low mana",
         NextAction::array(0, new NextAction("hymn of hope", ACTION_HIGH), NULL)));
     
-    triggers.push_back(new TriggerNode(
-        "enemy too close for spell",
-		NextAction::array(0, new NextAction("flee", 49.0f), NULL)));
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
 
     triggers.push_back(new TriggerNode("often", NextAction::array(0, new NextAction("apply oil", 1.0f), nullptr)));
 }

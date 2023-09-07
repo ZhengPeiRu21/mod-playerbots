@@ -1,7 +1,8 @@
 #include "EventMap.h"
 #include "Playerbots.h"
-#include "RaidNaxxTrigger.h"
+#include "RaidNaxxTriggers.h"
 #include "ScriptedCreature.h"
+#include "Trigger.h"
 
 bool AuraRemovedTrigger::IsActive() {
     bool check = botAI->HasAura(name, bot, false, false, -1, true);
@@ -91,23 +92,23 @@ bool HeiganRangedTrigger::IsActive()
     return botAI->IsRanged(bot);
 }
 
-// bool RazuviousTankTrigger::IsActive()
-// {
-//     Difficulty diff = bot->GetRaidDifficulty();
-//     if (diff == RAID_DIFFICULTY_10MAN_NORMAL) {
-//         return BossPhaseTrigger::IsActive() && botAI->IsTank(bot);
-//     }
-//     return BossPhaseTrigger::IsActive() && bot->getClass() == CLASS_PRIEST;
-// }
+bool RazuviousTankTrigger::IsActive()
+{
+    Difficulty diff = bot->GetRaidDifficulty();
+    if (diff == RAID_DIFFICULTY_10MAN_NORMAL) {
+        return helper.UpdateBossAI() && botAI->IsTank(bot);
+    }
+    return helper.UpdateBossAI() && bot->getClass() == CLASS_PRIEST;
+}
 
-// bool RazuviousNontankTrigger::IsActive()
-// {
-//     Difficulty diff = bot->GetRaidDifficulty();
-//     if (diff == RAID_DIFFICULTY_10MAN_NORMAL) {
-//         return BossPhaseTrigger::IsActive() && !(botAI->IsTank(bot));
-//     }
-//     return BossPhaseTrigger::IsActive() && !(bot->getClass() == CLASS_PRIEST);
-// }
+bool RazuviousNontankTrigger::IsActive()
+{
+    Difficulty diff = bot->GetRaidDifficulty();
+    if (diff == RAID_DIFFICULTY_10MAN_NORMAL) {
+        return helper.UpdateBossAI() && !(botAI->IsTank(bot));
+    }
+    return helper.UpdateBossAI() && !(bot->getClass() == CLASS_PRIEST);
+}
 
 // bool HorsemanAttractorsTrigger::IsActive()
 // {
@@ -126,10 +127,21 @@ bool HeiganRangedTrigger::IsActive()
 //           botAI->IsHealAssistantOfIndex(bot, 1) || botAI->IsHealAssistantOfIndex(bot, 2));
 // }
 
-// bool SapphironGroundMainTankTrigger::IsActive()
-// {
-//     return BossPhaseTrigger::IsActive() && botAI->IsMainTank(bot) && AI_VALUE2(bool, "has aggro", "boss target");
-// }
+bool SapphironGroundTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    return helper.IsPhaseGround();
+}
+
+bool SapphironFlightTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    return helper.IsPhaseFlight();
+}
 
 // bool SapphironGroundExceptMainTankTrigger::IsActive()
 // {
@@ -146,25 +158,34 @@ bool HeiganRangedTrigger::IsActive()
 //     return BossPhaseTrigger::IsActive() && !botAI->IsMainTank(bot) && botAI->HasAura("chill", bot);
 // }
 
-// bool GluthMainTankMortalWoundTrigger::IsActive()
-// {
-//     if (!BossPhaseTrigger::IsActive()) {
-//         return false;
-//     }
-//     if (!botAI->IsAssistTankOfIndex(bot, 0)) {
-//         return false;
-//     }
-//     Unit* mt = AI_VALUE(Unit*, "main tank");
-//     if (!mt) {
-//         return false;
-//     }
-//     Aura* aura = botAI->GetAuraWithDuration("mortal wound", mt);
-//     if (!aura || aura->GetStackAmount() < 5) {
-//         return false;
-//     }
-//     // bot->Yell("Time to taunt!", LANG_UNIVERSAL);
-//     return true;
-// }
+bool GluthTrigger::IsActive()
+{
+    return helper.UpdateBossAI();
+}
+
+bool GluthMainTankMortalWoundTrigger::IsActive()
+{
+    if (!helper.UpdateBossAI()) {
+        return false;
+    }
+    if (!botAI->IsAssistTankOfIndex(bot, 0)) {
+        return false;
+    }
+    Unit* mt = AI_VALUE(Unit*, "main tank");
+    if (!mt) {
+        return false;
+    }
+    Aura* aura = botAI->GetAura("mortal wound", mt, false, true);
+    if (!aura || aura->GetStackAmount() < 5) {
+        return false;
+    }
+    return true;
+}
+
+bool KelthuzadTrigger::IsActive() 
+{
+    return helper.UpdateBossAI();
+}
 
 template bool BossEventTrigger<boss_grobbulus::boss_grobbulusAI>::IsActive();
 template bool BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>::IsActive();

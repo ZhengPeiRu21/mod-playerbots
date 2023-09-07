@@ -11,10 +11,10 @@
 
 class PlayerbotAI;
 
-class HunterNoStingsActiveTrigger : public Trigger
+class HunterNoStingsActiveTrigger : public DebuffTrigger
 {
     public:
-        HunterNoStingsActiveTrigger(PlayerbotAI* botAI): Trigger(botAI, "no stings") {}
+        HunterNoStingsActiveTrigger(PlayerbotAI* botAI): DebuffTrigger(botAI, "no stings") {}
         bool IsActive() override;
 };
 
@@ -67,10 +67,10 @@ class BlackArrowTrigger : public DebuffTrigger
         BlackArrowTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "black arrow", 1, true) { }
 };
 
-class HuntersMarkTrigger : public DebuffTrigger
+class HuntersMarkTrigger : public DebuffOnBossTrigger
 {
     public:
-        HuntersMarkTrigger(PlayerbotAI* botAI) : DebuffTrigger(botAI, "hunter's mark") { }
+        HuntersMarkTrigger(PlayerbotAI* botAI) : DebuffOnBossTrigger(botAI, "hunter's mark") { }
 };
 
 class FreezingTrapTrigger : public HasCcTargetTrigger

@@ -1,15 +1,13 @@
 
-#ifndef _PLAYERBOT_RAIDNAXXTRIGGER_H
-#define _PLAYERBOT_RAIDNAXXTRIGGER_H
+#ifndef _PLAYERBOT_RAIDNAXXTRIGGERS_H
+#define _PLAYERBOT_RAIDNAXXTRIGGERS_H
 
 #include "EventMap.h"
 #include "Trigger.h"
 #include "PlayerbotAIConfig.h"
 #include "GenericTriggers.h"
-#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_grobbulus.h"
-#include "../../../../src/server/scripts/Northrend/Naxxramas/boss_anubrekhan.h"
-
-using namespace std;
+#include "RaidNaxxScripts.h"
+#include "RaidNaxxBossHelper.h"
 
 class MutatingInjectionTrigger : public HasAuraTrigger
 {
@@ -20,7 +18,7 @@ public:
 class AuraRemovedTrigger : public Trigger
 {
 public:
-    AuraRemovedTrigger(PlayerbotAI* botAI, string name): Trigger(botAI, name, 1) {
+    AuraRemovedTrigger(PlayerbotAI* botAI, std::string name): Trigger(botAI, name, 1) {
         this->prev_check = false;
     }
     virtual bool IsActive() override;
@@ -39,7 +37,7 @@ template<class T>
 class BossEventTrigger : public Trigger
 {
 public:
-    BossEventTrigger(PlayerbotAI* ai, uint32 boss_entry, uint32 event_id, string name = "boss event"): Trigger(ai, name, 1) {
+    BossEventTrigger(PlayerbotAI* ai, uint32 boss_entry, uint32 event_id, std::string name = "boss event"): Trigger(ai, name, 1) {
         this->boss_entry = boss_entry;
         this->event_id = event_id;
         this->last_event_time = -1;
@@ -53,13 +51,13 @@ template<class T>
 class BossPhaseTrigger : public Trigger
 {
 public:
-    BossPhaseTrigger(PlayerbotAI* ai, string boss_name, uint32 phase_mask, string name = "boss event"): Trigger(ai, name, 1) {
+    BossPhaseTrigger(PlayerbotAI* ai, std::string boss_name, uint32 phase_mask, std::string name = "boss event"): Trigger(ai, name, 1) {
         this->boss_name = boss_name;
         this->phase_mask = phase_mask;
     }
     virtual bool IsActive();
 protected:
-    string boss_name;
+    std::string boss_name;
     uint32 phase_mask;
 };
 
@@ -79,9 +77,42 @@ public:
 
 class HeiganRangedTrigger : public Trigger
 {
+    public:
+        HeiganRangedTrigger(PlayerbotAI* ai): Trigger(ai, "heigan ranged") {}
+        bool IsActive() override;
+};
+
+class RazuviousTankTrigger : public Trigger
+{
+    public:
+        RazuviousTankTrigger(PlayerbotAI* ai) : Trigger(ai, "instructor razuvious tank"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        RazuviousBossHelper helper;
+};
+
+class RazuviousNontankTrigger : public Trigger
+{
+    public:
+        RazuviousNontankTrigger(PlayerbotAI* ai) : Trigger(ai, "instructor razuvious non-tank"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        RazuviousBossHelper helper;
+};
+
+class KelthuzadTrigger : public Trigger
+{
+    public:
+        KelthuzadTrigger(PlayerbotAI* ai) : Trigger(ai, "kel'thuzad trigger"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        KelthuzadBossHelper helper;
+};
+
+class AnubrekhanTrigger : public BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>
+{
 public:
-    HeiganRangedTrigger(PlayerbotAI* ai): Trigger(ai, "heigan ranged") {}
-    virtual bool IsActive();
+    AnubrekhanTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
 };
 
 // class ThaddiusPhasePetTrigger : public BossPhaseTrigger
@@ -112,20 +143,6 @@ public:
 //     ThaddiusPhaseThaddiusTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "thaddius", 1 << (4 - 1), "thaddius phase thaddius") {}
 // };
 
-// class RazuviousTankTrigger : public BossPhaseTrigger
-// {
-// public:
-//     RazuviousTankTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "instructor razuvious", 0, "razuvious tank") {}
-//     virtual bool IsActive();
-// };
-
-// class RazuviousNontankTrigger : public BossPhaseTrigger
-// {
-// public:
-//     RazuviousNontankTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "instructor razuvious", 0, "razuvious nontank") {}
-//     virtual bool IsActive();
-// };
-
 // class HorsemanAttractorsTrigger : public BossPhaseTrigger
 // {
 // public:
@@ -140,12 +157,14 @@ public:
 //     virtual bool IsActive();
 // };
 
-// class SapphironGroundMainTankTrigger : public BossPhaseTrigger
-// {
-// public:
-//     SapphironGroundMainTankTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "sapphiron", (1 << (2 - 1)), "sapphiron ground main tank") {}
-//     virtual bool IsActive();
-// };
+class SapphironGroundTrigger : public Trigger
+{
+    public:
+        SapphironGroundTrigger(PlayerbotAI* ai) : Trigger(ai, "sapphiron ground"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        SapphironBossHelper helper;
+};
 
 // class SapphironGroundExceptMainTankTrigger : public BossPhaseTrigger
 // {
@@ -154,12 +173,14 @@ public:
 //     virtual bool IsActive();
 // };
 
-// class SapphironFlightTrigger : public BossPhaseTrigger
-// {
-// public:
-//     SapphironFlightTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "sapphiron", (1 << (3 - 1)), "sapphiron flight") {}
-//     virtual bool IsActive();
-// };
+class SapphironFlightTrigger : public Trigger
+{
+    public:
+        SapphironFlightTrigger(PlayerbotAI* ai) : Trigger(ai, "sapphiron flight"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        SapphironBossHelper helper;
+};
 
 // class SapphironGroundChillTrigger : public BossPhaseTrigger
 // {
@@ -168,17 +189,7 @@ public:
 //     virtual bool IsActive();
 // };
 
-// class KelthuzadTrigger : public BossPhaseTrigger
-// {
-// public:
-//     KelthuzadTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "kel'thuzad", 0, "kel'thuzad trigger") {}
-// };
 
-class AnubrekhanTrigger : public BossPhaseTrigger<boss_anubrekhan::boss_anubrekhanAI>
-{
-public:
-    AnubrekhanTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "anub'rekhan", 0, "anub'rekhan trigger") {}
-};
 
 // class KelthuzadPhaseTwoTrigger : public BossPhaseTrigger
 // {
@@ -186,18 +197,23 @@ public:
 //     KelthuzadPhaseTwoTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "kel'thuzad", 1 << (2 - 1), "kel'thuzad trigger") {}
 // };
 
-// class GluthTrigger : public BossPhaseTrigger
-// {
-// public:
-//     GluthTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "gluth", 0, "gluth trigger") {}
-// };
+class GluthTrigger : public Trigger
+{
+    public:
+        GluthTrigger(PlayerbotAI* ai) : Trigger(ai, "gluth trigger"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        GluthBossHelper helper;
+};
 
-// class GluthMainTankMortalWoundTrigger : public BossPhaseTrigger
-// {
-// public:
-//     GluthMainTankMortalWoundTrigger(PlayerbotAI* ai) : BossPhaseTrigger(ai, "gluth", 0, "gluth main tank mortal wound trigger") {}
-//     virtual bool IsActive();
-// };
+class GluthMainTankMortalWoundTrigger : public Trigger
+{
+    public:
+        GluthMainTankMortalWoundTrigger(PlayerbotAI* ai) : Trigger(ai, "gluth main tank mortal wound trigger"), helper(ai) {}
+        bool IsActive() override;
+    private:
+        GluthBossHelper helper;
+};
 
 // class LoathebTrigger : public BossPhaseTrigger
 // {

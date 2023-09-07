@@ -102,10 +102,10 @@ class CastAdrenalineRushAction : public CastBuffSpellAction
 		CastAdrenalineRushAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "adrenaline rush") { }
 };
 
-class CastKillingSpreeAction : public CastBuffSpellAction
+class CastKillingSpreeAction : public CastMeleeSpellAction
 {
 	public:
-		CastKillingSpreeAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "killing spree") { }
+		CastKillingSpreeAction(PlayerbotAI* botAI) : CastMeleeSpellAction(botAI, "killing spree") { }
 };
 
 class CastKickOnEnemyHealerAction : public CastSpellOnEnemyHealerAction
@@ -142,4 +142,11 @@ class UseInstantPoisonAction : public UseItemAction
 		virtual bool Execute(Event event) override;
 		virtual bool isPossible() override;
 };
+
+class FanOfKnivesAction : public CastMeleeSpellAction
+{
+	public:
+		FanOfKnivesAction(PlayerbotAI* ai) : CastMeleeSpellAction(ai, "fan of knives") {}
+};
+
 #endif

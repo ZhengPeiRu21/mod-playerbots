@@ -3,8 +3,10 @@
  */
 
 #include "ItemUsageValue.h"
+#include "AiFactory.h"
 #include "ChatHelper.h"
 #include "GuildTaskMgr.h"
+#include "PlayerbotFactory.h"
 #include "Playerbots.h"
 #include "RandomItemMgr.h"
 #include "ServerFacade.h"
@@ -76,7 +78,7 @@ ItemUsage ItemUsageValue::Calculate()
             }
         }
     }
-
+    
     if (bot->GetGuildId() && sGuildTaskMgr->IsGuildTaskItem(itemId, bot->GetGuildId()))
         return ITEM_USAGE_GUILD_TASK;
 
@@ -152,7 +154,7 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     if (itemProto->InventoryType == INVTYPE_NON_EQUIP)
         return ITEM_USAGE_NONE;
 
-    Item* pItem = Item::CreateItem(itemProto->ItemId, 1, bot);
+    Item* pItem = Item::CreateItem(itemProto->ItemId, 1, bot, false, 0, true);
     if (!pItem)
         return ITEM_USAGE_NONE;
 
@@ -180,8 +182,9 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     }
 
     bool shouldEquip = false;
-    uint32 statWeight = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
-    if (statWeight)
+    // uint32 statWeight = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
+    float itemScore = PlayerbotFactory::CalculateItemScore(itemProto->ItemId, bot);
+    if (itemScore)
         shouldEquip = true;
 
     if (itemProto->Class == ITEM_CLASS_WEAPON && !sRandomItemMgr->CanEquipWeapon(bot->getClass(), itemProto))
@@ -199,12 +202,13 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
             return ITEM_USAGE_BAD_EQUIP;
 
     ItemTemplate const* oldItemProto = oldItem->GetTemplate();
+    float oldScore = PlayerbotFactory::CalculateItemScore(oldItemProto->ItemId, bot);
     if (oldItem)
     {
-        uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
-        if (statWeight || oldStatWeight)
+        // uint32 oldStatWeight = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
+        if (itemScore || oldScore)
         {
-            shouldEquip = statWeight >= oldStatWeight;
+            shouldEquip = itemScore > oldScore * 1.1;
         }
     }
 
@@ -222,17 +226,17 @@ ItemUsage ItemUsageValue::QueryItemUsageForEquip(ItemTemplate const* itemProto)
     if (oldItemProto->Class == ITEM_CLASS_ARMOR && !sRandomItemMgr->CanEquipArmor(bot->getClass(), bot->getLevel(), oldItemProto))
         existingShouldEquip = false;
 
-    uint32 oldItemPower = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
-    uint32 newItemPower = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
+    // uint32 oldItemPower = sRandomItemMgr->GetLiveStatWeight(bot, oldItemProto->ItemId);
+    // uint32 newItemPower = sRandomItemMgr->GetLiveStatWeight(bot, itemProto->ItemId);
 
     //Compare items based on item level, quality or itemId.
     bool isBetter = false;
-    if (newItemPower > oldItemPower)
+    if (itemScore > oldScore)
         isBetter = true;
-    else if (newItemPower == oldItemPower && itemProto->Quality > oldItemProto->Quality)
-        isBetter = true;
-    else if (newItemPower == oldItemPower && itemProto->Quality == oldItemProto->Quality && itemProto->ItemId > oldItemProto->ItemId)
-        isBetter = true;
+    // else if (newItemPower == oldScore && itemProto->Quality > oldItemProto->Quality)
+    //     isBetter = true;
+    // else if (newItemPower == oldScore && itemProto->Quality == oldItemProto->Quality && itemProto->ItemId > oldItemProto->ItemId)
+    //     isBetter = true;
 
     Item* item = CurrentItem(itemProto);
     bool itemIsBroken = item && item->GetUInt32Value(ITEM_FIELD_DURABILITY) == 0 && item->GetUInt32Value(ITEM_FIELD_MAXDURABILITY) > 0;

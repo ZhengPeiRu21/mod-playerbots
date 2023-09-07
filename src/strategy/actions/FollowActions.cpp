@@ -7,6 +7,8 @@
 #include "Formations.h"
 #include "Playerbots.h"
 #include "ServerFacade.h"
+#include "SharedDefines.h"
+#include <cstddef>
 
 bool FollowAction::Execute(Event event)
 {
@@ -23,7 +25,7 @@ bool FollowAction::Execute(Event event)
         WorldLocation loc = formation->GetLocation();
         if (Formation::IsNullLocation(loc) || loc.GetMapId() == -1)
             return false;
-        
+
         moved = MoveTo(loc.GetMapId(), loc.GetPositionX(), loc.GetPositionY(), loc.GetPositionZ());
     }
 
@@ -32,11 +34,14 @@ bool FollowAction::Execute(Event event)
         if (CreatureAI* creatureAI = ((Creature*)pet)->AI())
         {
             pet->SetReactState(REACT_PASSIVE);
-            pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
-            pet->GetCharmInfo()->SetIsFollowing(true);
-            pet->AttackStop();
+            pet->GetCharmInfo()->SetIsCommandFollow(true);
             pet->GetCharmInfo()->IsReturning();
             pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
+            // pet->GetCharmInfo()->SetCommandState(COMMAND_FOLLOW);
+            // pet->GetCharmInfo()->SetIsFollowing(true);
+            // pet->AttackStop();
+            // pet->GetCharmInfo()->IsReturning();
+            // pet->GetMotionMaster()->MoveFollow(bot, PET_FOLLOW_DIST, pet->GetFollowAngle());
         }
     }
     //if (moved)
@@ -47,6 +52,9 @@ bool FollowAction::Execute(Event event)
 
 bool FollowAction::isUseful()
 {
+    if (bot->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != nullptr) {
+        return false;
+    }
     Formation* formation = AI_VALUE(Formation*, "formation");
     std::string const target = formation->GetTargetName();
 

@@ -16,7 +16,7 @@ bool AttackEnemyPlayerAction::isUseful()
     if (bot->HasAura(23333) || bot->HasAura(23335) || bot->HasAura(34976))
         return false;
 
-    return !sPlayerbotAIConfig->IsInPvpProhibitedZone(bot->GetAreaId());
+    return !sPlayerbotAIConfig->IsInPvpProhibitedZone(bot->GetZoneId());
 }
 
 bool AttackEnemyFlagCarrierAction::isUseful()
@@ -33,9 +33,12 @@ bool AttackAnythingAction::isUseful()
     if (!AI_VALUE(bool, "can move around"))
         return false;
 
-    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) //Bot is traveling
+    if (context->GetValue<TravelTarget*>("travel target")->Get()->isTraveling() && 
+        ChooseRpgTargetAction::isFollowValid(bot, *context->GetValue<TravelTarget*>("travel target")->Get()->getPosition())) //Bot is traveling
         return false;
-
+    // if (bot->IsInCombat()) {
+    //     return false;
+    // }
     Unit* target = GetTarget();
 
     if (!target)
@@ -61,13 +64,13 @@ bool DropTargetAction::Execute(Event event)
             context->GetValue<LootObjectStack*>("available loot")->Get()->Add(guid);
     }
 
-    ObjectGuid pullTarget = context->GetValue<ObjectGuid>("pull target")->Get();
-    GuidVector possible = botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets no los")->Get();
+    // ObjectGuid pullTarget = context->GetValue<ObjectGuid>("pull target")->Get();
+    // GuidVector possible = botAI->GetAiObjectContext()->GetValue<GuidVector>("possible targets no los")->Get();
 
-    if (pullTarget && find(possible.begin(), possible.end(), pullTarget) == possible.end())
-    {
-        context->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid::Empty);
-    }
+    // if (pullTarget && find(possible.begin(), possible.end(), pullTarget) == possible.end())
+    // {
+    //     context->GetValue<ObjectGuid>("pull target")->Set(ObjectGuid::Empty);
+    // }
 
     context->GetValue<Unit*>("current target")->Set(nullptr);
 
@@ -104,7 +107,7 @@ bool AttackAnythingAction::Execute(Event event)
             {
                 context->GetValue<ObjectGuid>("pull target")->Set(grindTarget->GetGUID());
                 bot->GetMotionMaster()->Clear();
-                bot->StopMoving();
+                // bot->StopMoving();
             }
         }
     }

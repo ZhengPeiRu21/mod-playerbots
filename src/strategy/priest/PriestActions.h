@@ -90,7 +90,7 @@ SPELL_ACTION(CastSilenceAction, "silence");
 ENEMY_HEALER_ACTION(CastSilenceOnEnemyHealerAction, "silence");
 // shadow talents 2.4.3
 DEBUFF_CHECKISOWNER_ACTION(CastVampiricTouchAction, "vampiric touch");
-
+DEBUFF_ENEMY_ACTION(CastVampiricTouchOnAttackerAction, "vampiric touch");
 // racials
 DEBUFF_CHECKISOWNER_ACTION(CastDevouringPlagueAction, "devouring plague");
 BUFF_ACTION(CastTouchOfWeaknessAction, "touch of weakness");
@@ -148,5 +148,18 @@ class CastShadowfiendAction : public CastSpellAction
 public:
     CastShadowfiendAction(PlayerbotAI* ai) : CastSpellAction(ai, "shadowfiend") {}
     virtual std::string const GetTargetName() { return "current target"; }
+};
+
+class CastPowerWordShieldOnAlmostFullHealthBelow : public HealPartyMemberAction {
+public:
+    CastPowerWordShieldOnAlmostFullHealthBelow(PlayerbotAI* ai) : HealPartyMemberAction(ai, "power word: shield") {}
+    bool isUseful() override;
+    Unit* GetTarget() override;
+};
+
+class CastMindSearAction : public CastSpellAction
+{
+    public:
+        CastMindSearAction(PlayerbotAI* ai) : CastSpellAction(ai, "mind sear") {}
 };
 #endif

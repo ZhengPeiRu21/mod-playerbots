@@ -13,7 +13,7 @@ GenericWarriorStrategy::GenericWarriorStrategy(PlayerbotAI* botAI) : CombatStrat
 void GenericWarriorStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     CombatStrategy::InitTriggers(triggers);
-
+    triggers.push_back(new TriggerNode("enemy out of melee", NextAction::array(0, new NextAction("reach melee", ACTION_NORMAL + 8), nullptr)));
     /*triggers.push_back(new TriggerNode("bloodrage", NextAction::array(0, new NextAction("bloodrage", ACTION_HIGH + 1), nullptr)));
     triggers.push_back(new TriggerNode("shield bash", NextAction::array(0, new NextAction("shield bash", ACTION_INTERRUPT + 4), nullptr)));
     triggers.push_back(new TriggerNode("shield bash on enemy healer", NextAction::array(0, new NextAction("shield bash on enemy healer", ACTION_INTERRUPT + 3), nullptr)));
@@ -41,11 +41,13 @@ void WarrirorAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("thunder clap on snare target", NextAction::array(0, new NextAction("thunder clap on snare target", ACTION_HIGH + 3), nullptr)));
     triggers.push_back(new TriggerNode("thunder clap", NextAction::array(0, new NextAction("thunder clap", ACTION_HIGH + 10), nullptr)));
-    triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("demoralizing shout", ACTION_HIGH + 1), nullptr)));
+    triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, 
+        new NextAction("demoralizing shout", ACTION_HIGH + 1), 
+        new NextAction("shockwave", ACTION_HIGH + 4),
+        new NextAction("sweeping strikes", ACTION_HIGH + 3),
+        new NextAction("bladestorm", ACTION_HIGH + 3),
+        new NextAction("whirlwind", ACTION_HIGH + 2),
+        nullptr)));
     triggers.push_back(new TriggerNode("shockwave on snare target", NextAction::array(0, new NextAction("shockwave on snare target", ACTION_HIGH + 5), nullptr)));
-    triggers.push_back(new TriggerNode("shockwave", NextAction::array(0, new NextAction("shockwave", ACTION_HIGH + 4), nullptr)));
-    triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("sweeping strikes", ACTION_HIGH + 3), nullptr)));
-    triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("bladestorm", ACTION_HIGH + 3), nullptr)));
-    triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("whirlwind", ACTION_HIGH + 2), nullptr)));
     triggers.push_back(new TriggerNode("high rage available", NextAction::array(0, new NextAction("whirlwind", ACTION_HIGH + 10), nullptr)));
 }

@@ -41,7 +41,7 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericShamanStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), nullptr)));
+    // triggers.push_back(new TriggerNode("enemy out of spell", NextAction::array(0, new NextAction("reach spell", ACTION_NORMAL + 9), nullptr)));
     triggers.push_back(new TriggerNode("shaman weapon", NextAction::array(0, new NextAction("earthliving weapon", 22.0f), nullptr)));
     triggers.push_back(new TriggerNode(
 		"group heal occasion",
@@ -93,9 +93,11 @@ void HealShamanStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
         "earth shield on main tank",
 		NextAction::array(0, new NextAction("earth shield on main tank", ACTION_HIGH + 7), NULL)));
 
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
+
     triggers.push_back(new TriggerNode(
-        "enemy too close for spell",
-		NextAction::array(0, new NextAction("flee", 49.0f), NULL)));
+        "medium mana",
+        NextAction::array(0, new NextAction("mana tide totem", ACTION_HIGH + 5), NULL)));
 
     triggers.push_back(new TriggerNode("party member to heal out of spell range", NextAction::array(0, new NextAction("reach party member to heal", ACTION_CRITICAL_HEAL + 1), nullptr)));
 }

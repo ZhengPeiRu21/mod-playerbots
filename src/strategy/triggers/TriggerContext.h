@@ -16,7 +16,7 @@
 #include "StuckTriggers.h"
 #include "TravelTriggers.h"
 #include "NamedObjectContext.h"
-#include "RaidNaxxTrigger.h"
+#include "RaidNaxxTriggers.h"
 
 class PlayerbotAI;
 
@@ -68,7 +68,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["not dps target active"] = &TriggerContext::not_dps_target_active;
             creators["not dps aoe target active"] = &TriggerContext::not_dps_aoe_target_active;
             creators["has nearest adds"] = &TriggerContext::has_nearest_adds;
-            creators["enemy player inear"] = &TriggerContext::enemy_player_near;
+            creators["enemy player near"] = &TriggerContext::enemy_player_near;
 
             creators["tank assist"] = &TriggerContext::TankAssist;
             creators["lose aggro"] = &TriggerContext::LoseAggro;
@@ -98,6 +98,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["dead"] = &TriggerContext::Dead;
             creators["corpse near"] = &TriggerContext::corpse_near;
             creators["party member dead"] = &TriggerContext::PartyMemberDead;
+            creators["combat party member dead"] = &TriggerContext::CombatPartyMemberDead;
             creators["no pet"] = &TriggerContext::no_pet;
             creators["has pet"] = &TriggerContext::has_pet;
             creators["has attackers"] = &TriggerContext::has_attackers;
@@ -122,6 +123,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["low aoe heal"] = &TriggerContext::low_aoe_heal;
             creators["medium aoe heal"] = &TriggerContext::medium_aoe_heal;
             creators["group heal occasion"] = &TriggerContext::group_heal_occasion;
+            creators["medium group heal occasion"] = &TriggerContext::medium_group_heal_occasion;
             creators["invalid target"] = &TriggerContext::invalid_target;
             creators["lfg proposal active"] = &TriggerContext::lfg_proposal_active;
 
@@ -193,38 +195,6 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["rpg craft"] = &TriggerContext::rpg_craft;
             creators["rpg trade useful"] = &TriggerContext::rpg_trade_useful;
             creators["rpg duel"] = &TriggerContext::rpg_duel;
-
-            creators["mutating injection"] = &TriggerContext::mutating_injection;
-            creators["mutating injection removed"] = &TriggerContext::mutating_injection_removed;
-            creators["grobbulus cloud"] = &TriggerContext::grobbulus_cloud;
-            creators["heigan melee"] = &TriggerContext::heigan_melee;
-            creators["heigan ranged"] = &TriggerContext::heigan_ranged;
-
-            // creators["thaddius phase pet"] = &TriggerContext::thaddius_phase_pet;
-            // creators["thaddius phase pet lose aggro"] = &TriggerContext::thaddius_phase_pet_lose_aggro;
-            // creators["thaddius phase transition"] = &TriggerContext::thaddius_phase_transition;
-            // creators["thaddius phase thaddius"] = &TriggerContext::thaddius_phase_thaddius;
-
-            // creators["razuvious tank"] = &TriggerContext::razuvious_tank;
-            // creators["razuvious nontank"] = &TriggerContext::razuvious_nontank;
-
-            // creators["horseman attractors"] = &TriggerContext::horseman_attractors;
-            // creators["horseman except attractors"] = &TriggerContext::horseman_except_attractors;
-
-            // creators["sapphiron ground main tank"] = &TriggerContext::sapphiron_ground_main_tank;
-            // creators["sapphiron ground except main tank"] = &TriggerContext::sapphiron_ground_except_main_tank;
-            // creators["sapphiron flight"] = &TriggerContext::sapphiron_flight;
-            // creators["sapphiron chill"] = &TriggerContext::sapphiron_ground_chill;
-
-            // creators["kel'thuzad"] = &TriggerContext::kelthuzad;
-            // creators["kel'thuzad phase two"] = &TriggerContext::kelthuzad_phase_two;
-
-            creators["anub'rekhan"] = &TriggerContext::anubrekhan;
-
-            // creators["gluth"] = &TriggerContext::gluth;
-            // creators["gluth main tank mortal wound"] = &TriggerContext::gluth_main_tank_mortal_wound;
-            
-            // creators["loatheb"] = &TriggerContext::loatheb;
         }
 
     private:
@@ -247,6 +217,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* low_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "low aoe heal", "low", 2); }
         static Trigger* medium_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "medium aoe heal", "medium", 2); }
         static Trigger* group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "almost full", 0.4); }
+        static Trigger* medium_group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "medium", 0.4); }
         static Trigger* target_changed(PlayerbotAI* botAI) { return new TargetChangedTrigger(botAI); }
         static Trigger* swimming(PlayerbotAI* botAI) { return new IsSwimmingTrigger(botAI); }
         static Trigger* no_possible_targets(PlayerbotAI* botAI) { return new NoPossibleTargetsTrigger(botAI); }
@@ -309,6 +280,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* Dead(PlayerbotAI* botAI) { return new DeadTrigger(botAI); }
         static Trigger* corpse_near(PlayerbotAI* botAI) { return new CorpseNearTrigger(botAI); }
         static Trigger* PartyMemberDead(PlayerbotAI* botAI) { return new PartyMemberDeadTrigger(botAI); }
+        static Trigger* CombatPartyMemberDead(PlayerbotAI* botAI) { return new CombatPartyMemberDeadTrigger(botAI); }
         static Trigger* PartyMemberLowHealth(PlayerbotAI* botAI) { return new PartyMemberLowHealthTrigger(botAI); }
         static Trigger* PartyMemberMediumHealth(PlayerbotAI* botAI) { return new PartyMemberMediumHealthTrigger(botAI); }
         static Trigger* PartyMemberAlmostFullHealth(PlayerbotAI* botAI) { return new PartyMemberAlmostFullHealthTrigger(botAI); }
@@ -365,31 +337,6 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* rpg_craft(PlayerbotAI* botAI) { return new RpgCraftTrigger(botAI); }
         static Trigger* rpg_trade_useful(PlayerbotAI* botAI) { return new RpgTradeUsefulTrigger(botAI); }
         static Trigger* rpg_duel(PlayerbotAI* botAI) { return new RpgDuelTrigger(botAI); }
-
-        static Trigger* mutating_injection(PlayerbotAI* ai) { return new MutatingInjectionTrigger(ai); }
-        static Trigger* mutating_injection_removed(PlayerbotAI* ai) { return new MutatingInjectionRemovedTrigger(ai); }
-        static Trigger* grobbulus_cloud(PlayerbotAI* ai) { return new GrobbulusCloudTrigger(ai); }
-        static Trigger* heigan_melee(PlayerbotAI* ai) { return new HeiganMeleeTrigger(ai); }
-        static Trigger* heigan_ranged(PlayerbotAI* ai) { return new HeiganRangedTrigger(ai); }
-        // static Trigger* thaddius_phase_pet(PlayerbotAI* ai) { return new ThaddiusPhasePetTrigger(ai); }
-        // static Trigger* thaddius_phase_pet_lose_aggro(PlayerbotAI* ai) { return new ThaddiusPhasePetLoseAggroTrigger(ai); }
-        // static Trigger* thaddius_phase_transition(PlayerbotAI* ai) { return new ThaddiusPhaseTransitionTrigger(ai); }
-        // static Trigger* thaddius_phase_thaddius(PlayerbotAI* ai) { return new ThaddiusPhaseThaddiusTrigger(ai); }
-        // static Trigger* razuvious_tank(PlayerbotAI* ai) { return new RazuviousTankTrigger(ai); }
-        // static Trigger* razuvious_nontank(PlayerbotAI* ai) { return new RazuviousNontankTrigger(ai); }
-        
-        // static Trigger* horseman_attractors(PlayerbotAI* ai) { return new HorsemanAttractorsTrigger(ai); }
-        // static Trigger* horseman_except_attractors(PlayerbotAI* ai) { return new HorsemanExceptAttractorsTrigger(ai); }
-        // static Trigger* sapphiron_ground_main_tank(PlayerbotAI* ai) { return new SapphironGroundMainTankTrigger(ai); }
-        // static Trigger* sapphiron_ground_except_main_tank(PlayerbotAI* ai) { return new SapphironGroundExceptMainTankTrigger(ai); }
-        // static Trigger* sapphiron_flight(PlayerbotAI* ai) { return new SapphironFlightTrigger(ai); }
-        // static Trigger* sapphiron_ground_chill(PlayerbotAI* ai) { return new SapphironGroundChillTrigger(ai); }        
-        // static Trigger* kelthuzad(PlayerbotAI* ai) { return new KelthuzadTrigger(ai); }
-        // static Trigger* kelthuzad_phase_two(PlayerbotAI* ai) { return new KelthuzadPhaseTwoTrigger(ai); }
-        static Trigger* anubrekhan(PlayerbotAI* ai) { return new AnubrekhanTrigger(ai); }
-        // static Trigger* gluth(PlayerbotAI* ai) { return new GluthTrigger(ai); }
-        // static Trigger* gluth_main_tank_mortal_wound(PlayerbotAI* ai) { return new GluthMainTankMortalWoundTrigger(ai); }
-        // static Trigger* loatheb(PlayerbotAI* ai) { return new LoathebTrigger(ai); }
 };
 
 #endif

@@ -47,7 +47,6 @@
 #include "UseFoodStrategy.h"
 #include "UsePotionsStrategy.h"
 #include "WorldPacketHandlerStrategy.h"
-#include "RaidStrategy.h"
 
 class StrategyContext : public NamedObjectContext<Strategy>
 {
@@ -110,6 +109,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
             creators["guild"] = &StrategyContext::guild;
             creators["grind"] = &StrategyContext::grind;
             creators["avoid aoe"] = &StrategyContext::avoid_aoe;
+            creators["move random"] = &StrategyContext::move_random;
         }
 
     private:
@@ -169,6 +169,7 @@ class StrategyContext : public NamedObjectContext<Strategy>
         static Strategy* guild (PlayerbotAI* botAI) { return new GuildStrategy(botAI); }
         static Strategy* grind(PlayerbotAI* botAI) { return new GrindingStrategy(botAI); }
         static Strategy* avoid_aoe(PlayerbotAI* botAI) { return new AvoidAoeStrategy(botAI); }
+        static Strategy* move_random(PlayerbotAI* ai) { return new MoveRandomStrategy(ai); }
 };
 
 class MovementStrategyContext : public NamedObjectContext<Strategy>
@@ -221,15 +222,6 @@ class QuestStrategyContext : public NamedObjectContext<Strategy>
         static Strategy* accept_all_quests(PlayerbotAI* botAI) { return new AcceptAllQuestsStrategy(botAI); }
 };
 
-class RaidStrategyContext : public NamedObjectContext<Strategy>
-{
-    public:
-        RaidStrategyContext() : NamedObjectContext<Strategy>(false, true)
-        {
-            creators["naxx"] = &RaidStrategyContext::naxx;
-        }
-    private:
-        static Strategy* naxx(PlayerbotAI* botAI) { return new RaidNaxxGenericStrategy(botAI); }
-};
+
 
 #endif

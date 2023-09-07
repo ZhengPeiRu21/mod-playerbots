@@ -5,6 +5,7 @@
 #include "ChangeTalentsAction.h"
 #include "ChatHelper.h"
 #include "Event.h"
+#include "PlayerbotFactory.h"
 #include "Playerbots.h"
 
 bool ChangeTalentsAction::Execute(Event event)
@@ -14,7 +15,7 @@ bool ChangeTalentsAction::Execute(Event event)
     std::ostringstream out;
 
     TalentSpec botSpec(bot);
-
+    
     if (!param.empty())
     {
         if (param.find("auto") != std::string::npos)
@@ -28,6 +29,10 @@ bool ChangeTalentsAction::Execute(Event event)
         else  if (param.find("list") != std::string::npos)
         {
             listPremadePaths(getPremadePaths(""), &out);
+        } else if (param == "1") {
+            bot->ActivateSpec(0);
+        } else if (param == "2") {
+            bot->ActivateSpec(1);
         }
         else
         {
@@ -78,7 +83,7 @@ bool ChangeTalentsAction::Execute(Event event)
                     out.str("");
                     out.clear();
 
-                    if (paths.size() > 1 && sPlayerbotAIConfig->autoPickTalents != "full")
+                    if (paths.size() > 1 && false/*!sPlayerbotAIConfig->autoPickTalents*/)
                     {
                         out << "Found multiple specs: ";
                         listPremadePaths(paths, &out);
@@ -274,7 +279,7 @@ bool ChangeTalentsAction::AutoSelectTalents(std::ostringstream* out)
             specId = -1;
             // specLink = "";
         }
-        else if (paths.size() > 1 && sPlayerbotAIConfig->autoPickTalents != "full" && !sRandomPlayerbotMgr->IsRandomBot(bot))
+        else if (paths.size() > 1 && false/*!sPlayerbotAIConfig->autoPickTalents*/ && !sRandomPlayerbotMgr->IsRandomBot(bot))
         {
             *out << "Found multiple specs: ";
             listPremadePaths(paths, out);
@@ -324,13 +329,14 @@ bool AutoSetTalentsAction::Execute(Event event)
 {
     std::ostringstream out;
 
-    if (sPlayerbotAIConfig->autoPickTalents == "no" && !sRandomPlayerbotMgr->IsRandomBot(bot))
+    if (!sPlayerbotAIConfig->autoPickTalents || !sRandomPlayerbotMgr->IsRandomBot(bot))
         return false;
 
     if (bot->GetFreeTalentPoints() <= 0)
         return false;
 
-    AutoSelectTalents(&out);
+    PlayerbotFactory factory(bot, bot->GetLevel());
+    factory.InitTalentsTree(true, true, true);
 
     botAI->TellMaster(out);
 

@@ -4,17 +4,18 @@
 
 #include "HealPaladinStrategy.h"
 #include "Playerbots.h"
+#include "Strategy.h"
 
 class HealPaladinStrategyActionNodeFactory : public NamedObjectFactory<ActionNode>
 {
 public:
-    HealPaladinStrategyActionNodeFactory()
-    {
-        creators["concentration aura"] = &concentration_aura;
-    }
+    // HealPaladinStrategyActionNodeFactory()
+    // {
+    //     creators["concentration aura"] = &concentration_aura;
+    // }
 
 private:
-    ACTION_NODE_A(concentration_aura, "concentration aura", "devotion aura");
+    // ACTION_NODE_A(concentration_aura, "concentration aura", "devotion aura");
 };
 
 HealPaladinStrategy::HealPaladinStrategy(PlayerbotAI* botAI) : GenericPaladinStrategy(botAI)
@@ -31,7 +32,7 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     GenericPaladinStrategy::InitTriggers(triggers);
 
-    triggers.push_back(new TriggerNode("concentration aura", NextAction::array(0, new NextAction("concentration aura", 90.0f), nullptr)));
+    // triggers.push_back(new TriggerNode("concentration aura", NextAction::array(0, new NextAction("concentration aura", ACTION_NORMAL), nullptr)));
     triggers.push_back(new TriggerNode("seal", NextAction::array(0, new NextAction("seal of wisdom", ACTION_HIGH), nullptr)));
     triggers.push_back(new TriggerNode("low mana", NextAction::array(0, new NextAction("divine favor", ACTION_HIGH + 1), nullptr)));
     // triggers.push_back(new TriggerNode("blessing", NextAction::array(0, new NextAction("blessing of sanctuary", ACTION_HIGH + 9), nullptr)));
@@ -70,4 +71,6 @@ void HealPaladinStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     triggers.push_back(new TriggerNode(
         "sacred shield on main tank",
 		NextAction::array(0, new NextAction("sacred shield on main tank", ACTION_CRITICAL_HEAL + 6), NULL)));
+
+    triggers.push_back(new TriggerNode("enemy too close for spell", NextAction::array(0, new NextAction("flee", ACTION_HIGH), nullptr)));
 }

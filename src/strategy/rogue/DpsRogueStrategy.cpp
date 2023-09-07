@@ -70,7 +70,9 @@ DpsRogueStrategy::DpsRogueStrategy(PlayerbotAI* botAI) : MeleeCombatStrategy(bot
 
 NextAction** DpsRogueStrategy::getDefaultActions()
 {
-    return NextAction::array(0, new NextAction("melee", ACTION_NORMAL), NULL);
+    return NextAction::array(0, 
+        new NextAction("killing spree", ACTION_NORMAL + 1),
+        new NextAction("melee", ACTION_NORMAL), NULL);
 }
 
 void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -105,17 +107,21 @@ void DpsRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 		"kick on enemy healer",
 		NextAction::array(0, new NextAction("kick on enemy healer", ACTION_INTERRUPT + 1), NULL)));
 
-    triggers.push_back(new TriggerNode(
-        "behind target",
-        NextAction::array(0, new NextAction("backstab", ACTION_NORMAL), NULL)));
+    // triggers.push_back(new TriggerNode(
+    //     "behind target",
+    //     NextAction::array(0, new NextAction("backstab", ACTION_NORMAL), NULL)));
 
 	triggers.push_back(new TriggerNode(
 		"light aoe",
 		NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH + 3), NULL)));
 
-	// triggers.push_back(new TriggerNode(
-	// 	"enemy out of melee",
-	// 	NextAction::array(0, new NextAction("stealth", ACTION_NORMAL + 9), new NextAction("reach melee", ACTION_NORMAL + 8), NULL)));
+	triggers.push_back(new TriggerNode(
+		"enemy out of melee",
+		NextAction::array(0, 
+            new NextAction("stealth", ACTION_NORMAL + 9), 
+            new NextAction("sprint", ACTION_NORMAL + 8),
+            new NextAction("reach melee", ACTION_NORMAL + 7), 
+            NULL)));
 
     triggers.push_back(new TriggerNode(
         "expose armor",
@@ -203,6 +209,7 @@ void StealthedRogueStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
     /*triggers.push_back(new TriggerNode("low health", NextAction::array(0, new NextAction("food", ACTION_EMERGENCY + 1), nullptr)));*/
     triggers.push_back(new TriggerNode("no stealth", NextAction::array(0, new NextAction("check stealth", ACTION_EMERGENCY), nullptr)));
     triggers.push_back(new TriggerNode("sprint", NextAction::array(0, new NextAction("sprint", ACTION_INTERRUPT), nullptr)));
+    
 }
 
 void StealthStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
@@ -213,6 +220,9 @@ void StealthStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 void RogueAoeStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)
 {
     triggers.push_back(new TriggerNode("light aoe", NextAction::array(0, new NextAction("blade flurry", ACTION_HIGH), nullptr)));
+    triggers.push_back(new TriggerNode(
+		"medium aoe",
+		NextAction::array(0, new NextAction("fan of knives", ACTION_NORMAL + 5), NULL)));
 }
 
 void RogueBoostStrategy::InitTriggers(std::vector<TriggerNode*>& triggers)

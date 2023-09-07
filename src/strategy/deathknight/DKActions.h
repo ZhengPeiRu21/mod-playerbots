@@ -40,8 +40,6 @@ class CastDarkCommandAction : public CastSpellAction
 {
 	public:
 		CastDarkCommandAction(PlayerbotAI* botAI) : CastSpellAction(botAI, "dark command") { }
-
-        NextAction** getPrerequisites() override;
 };
 
 BEGIN_RANGED_SPELL_ACTION(CastDeathGripAction, "death grip")
@@ -106,20 +104,20 @@ class CastIcyTouchAction : public CastSpellAction
 		CastIcyTouchAction(PlayerbotAI* ai) : CastSpellAction(ai, "icy touch") {}
 };
 
-class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnAttackerAction
+class CastIcyTouchOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
 	public:
-		CastIcyTouchOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "icy touch", true) { }
+		CastIcyTouchOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "icy touch", true) { }
 };
 
 //debuff ps
 BEGIN_DEBUFF_ACTION(CastPlagueStrikeAction, "plague strike")
 END_SPELL_ACTION()
 
-class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnAttackerAction
+class CastPlagueStrikeOnAttackerAction : public CastDebuffSpellOnMeleeAttackerAction
 {
 	public:
-		CastPlagueStrikeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnAttackerAction(botAI, "plague strike", true) { }
+		CastPlagueStrikeOnAttackerAction(PlayerbotAI* botAI) : CastDebuffSpellOnMeleeAttackerAction(botAI, "plague strike", true) { }
 };
 
 //debuff
@@ -148,6 +146,7 @@ class CastGhoulFrenzyAction : public CastBuffSpellAction
 {
 	public:
 		CastGhoulFrenzyAction(PlayerbotAI* botAI) : CastBuffSpellAction(botAI, "ghoul frenzy") { }
+		std::string const GetTargetName() override { return "pet target"; }
 };
 
 BEGIN_MELEE_SPELL_ACTION(CastCorpseExplosionAction, "corpse explosion")

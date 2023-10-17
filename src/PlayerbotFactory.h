@@ -7,6 +7,7 @@
 
 #include "InventoryAction.h"
 #include "Player.h"
+#include "PlayerbotAI.h"
 
 class Item;
 
@@ -100,10 +101,10 @@ enum PriorizedConsumables
 
 #define MAX_CONSUM_ID 28
 
-class PlayerbotFactory : public InventoryAction
+class PlayerbotFactory
 {
     public:
-        PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality = 0);
+        PlayerbotFactory(Player* bot, uint32 level, uint32 itemQuality = 0, uint32 gearScoreLimit = 0);
 
         static ObjectGuid GetRandomBot();
         static void Init();
@@ -121,7 +122,8 @@ class PlayerbotFactory : public InventoryAction
         void InitEquipment(bool incremental);
         void InitPet();
         void InitAmmo();
-
+        static uint32 CalcMixedGearScore(uint32 gs, uint32 quality);
+        void InitPetTalents();
     private:
         void Prepare();
         // void InitSecondEquipmentSet();
@@ -138,6 +140,7 @@ class PlayerbotFactory : public InventoryAction
         void InitTalents(uint32 specNo);
         void InitTalentsByTemplate(uint32 specNo);
         void InitQuests(std::list<uint32>& questMap);
+        void InitInstanceQuests();
         void ClearInventory();
         void ClearAllItems();
         void ResetQuests();
@@ -170,14 +173,21 @@ class PlayerbotFactory : public InventoryAction
         std::vector<InventoryType> GetPossibleInventoryTypeListBySlot(EquipmentSlots slot);
         static bool IsShieldTank(Player* bot);
         static bool NotSameArmorType(uint32 item_subclass_armor, Player* bot);
+        void IterateItems(IterateItemsVisitor* visitor, IterateItemsMask mask = ITERATE_ITEMS_IN_BAGS);
+        void IterateItemsInBags(IterateItemsVisitor* visitor);
+        void IterateItemsInEquip(IterateItemsVisitor* visitor);
+        void IterateItemsInBank(IterateItemsVisitor* visitor);
         EnchantContainer::const_iterator GetEnchantContainerBegin() { return m_EnchantContainer.begin(); }
         EnchantContainer::const_iterator GetEnchantContainerEnd() { return m_EnchantContainer.end(); }
         uint32 level;
         uint32 itemQuality;
+        uint32 gearScoreLimit;
         static std::list<uint32> specialQuestIds;
         std::vector<uint32> trainerIdCache;
     protected:
         EnchantContainer m_EnchantContainer;
+        Player* bot;
+        PlayerbotAI* botAI;
 };
 
 #endif

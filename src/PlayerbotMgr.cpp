@@ -5,15 +5,19 @@
 #include "CharacterCache.h"
 #include "CharacterPackets.h"
 #include "Common.h"
+#include "Define.h"
 #include "ObjectAccessor.h"
 #include "ObjectMgr.h"
+#include "PlayerbotAIConfig.h"
 #include "PlayerbotMgr.h"
 #include "PlayerbotSecurity.h"
 #include "Playerbots.h"
 #include "PlayerbotDbStore.h"
 #include "PlayerbotFactory.h"
+#include "SharedDefines.h"
 #include "WorldSession.h"
 #include "ChannelMgr.h"
+#include <cstdio>
 #include <cstring>
 #include <string>
 
@@ -437,7 +441,10 @@ void PlayerbotHolder::OnBotLogin(Player* const bot)
     
     bot->SaveToDB(false, false);
     if (master && isRandomAccount && master->GetLevel() < bot->GetLevel()) {
-        PlayerbotFactory factory(bot, master->getLevel());
+        // PlayerbotFactory factory(bot, master->getLevel());
+        // factory.Randomize(false);
+        uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+        PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
         factory.Randomize(false);
     }
     
@@ -541,6 +548,10 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
 
     if (Player* master = GET_PLAYERBOT_AI(bot)->GetMaster())
     {
+        if (master->GetSession()->GetSecurity() <= SEC_PLAYER && sPlayerbotAIConfig->autoInitOnly && cmd != "init=auto") {
+            return "The command is not allowed, use init=auto instead.";
+        }
+        int gs;
         if (cmd == "init=white" || cmd == "init=common")
         {
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_NORMAL);
@@ -570,6 +581,20 @@ std::string const PlayerbotHolder::ProcessBotCommand(std::string const cmd, Obje
             PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY);
             factory.Randomize(false);
             return "ok";
+        }
+        else if (cmd == "init=auto")
+        {
+            uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, mixedGearScore);
+            factory.Randomize(false);
+            return "ok, gear score limit: " + std::to_string(mixedGearScore / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
+        }
+        else if (cmd.starts_with("init=") && sscanf(cmd.c_str(), "init=%d", &gs) != -1)
+        {
+            // uint32 mixedGearScore = PlayerbotAI::GetMixedGearScore(master, false, false, 12) * sPlayerbotAIConfig->autoInitEquipLevelLimitRatio;
+            PlayerbotFactory factory(bot, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
+            factory.Randomize(false);
+            return "ok, gear score limit: " + std::to_string(gs / (ITEM_QUALITY_EPIC + 1)) + "(for epic)";
         }
     }
 
@@ -651,18 +676,58 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "initself")) {
         if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
-            OnBotLogin(master);
+            // OnBotLogin(master);
             PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_EPIC);
             factory.Randomize(false);
-            // LogoutPlayerBot(master->GetGUID());
-            // DisablePlayerBot(master->GetGUID());
-            // sPlayerbotsMgr->AddPlayerbotData(master, false);
-            // sRandomPlayerbotMgr->OnPlayerLogin(master);
-            messages.push_back("initself ok. please logout to refresh.");
+            messages.push_back("initself ok");
             return messages;
         } else {
             messages.push_back("ERROR: Only GM can use this command.");
             return messages;
+        }
+    }
+
+    
+
+    
+    
+    if (!strncmp(cmd, "initself=", 9)) {
+        if (!strcmp(cmd, "initself=rare")) {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_RARE);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            } else {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        if (!strcmp(cmd, "initself=epic")) {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_EPIC);
+                factory.Randomize(false);
+                messages.push_back("initself ok");
+                return messages;
+            } else {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
+        }
+        int32 gs;
+        if (sscanf(cmd, "initself=%d", &gs) != -1) {
+            if (master->GetSession()->GetSecurity() >= SEC_GAMEMASTER) {
+                // OnBotLogin(master);
+                PlayerbotFactory factory(master, master->getLevel(), ITEM_QUALITY_LEGENDARY, gs);
+                factory.Randomize(false);
+                messages.push_back("initself ok, gs = " + std::to_string(gs));
+                return messages;
+            } else {
+                messages.push_back("ERROR: Only GM can use this command.");
+                return messages;
+            }
         }
     }
 
@@ -717,6 +782,10 @@ std::vector<std::string> PlayerbotHolder::HandlePlayerbotCommand(char const* arg
 
     if (!strcmp(cmd, "addclass"))
     {
+        if (sPlayerbotAIConfig->addClassCommand == 0) {
+            messages.push_back("addclass command was disabled, please check your configuration");
+            return messages;
+        }
         if (!charname) {
             messages.push_back("addclass: invalid CLASSNAME(warrior/paladin/hunter/rogue/priest/shaman/mage/warlock/druid/dk)");
             return messages;

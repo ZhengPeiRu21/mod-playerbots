@@ -146,6 +146,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
             creators["bg waiting"] = &TriggerContext::bg_waiting;
             creators["bg active"] = &TriggerContext::bg_active;
             creators["bg invite active"] = &TriggerContext::bg_invite_active;
+            creators["inside bg"] = &TriggerContext::inside_bg;
             creators["player has no flag"] = &TriggerContext::player_has_no_flag;
             creators["player has flag"] = &TriggerContext::player_has_flag;
             creators["team has flag"] = &TriggerContext::team_has_flag;
@@ -216,7 +217,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* critical_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "critical aoe heal", "critical", 2); }
         static Trigger* low_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "low aoe heal", "low", 2); }
         static Trigger* medium_aoe_heal(PlayerbotAI* botAI) { return new AoeHealTrigger(botAI, "medium aoe heal", "medium", 2); }
-        static Trigger* group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "almost full", 0.4); }
+        static Trigger* group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "almost full", 0.6); }
         static Trigger* medium_group_heal_occasion(PlayerbotAI* ai) { return new AoeInGroupTrigger(ai, "group heal occasion", "medium", 0.4); }
         static Trigger* target_changed(PlayerbotAI* botAI) { return new TargetChangedTrigger(botAI); }
         static Trigger* swimming(PlayerbotAI* botAI) { return new IsSwimmingTrigger(botAI); }
@@ -295,6 +296,7 @@ class TriggerContext : public NamedObjectContext<Trigger>
         static Trigger* bg_waiting(PlayerbotAI* botAI) { return new BgWaitingTrigger(botAI); }
         static Trigger* bg_active(PlayerbotAI* botAI) { return new BgActiveTrigger(botAI); }
         static Trigger* bg_invite_active(PlayerbotAI* botAI) { return new BgInviteActiveTrigger(botAI); }
+        static Trigger* inside_bg(PlayerbotAI* botAI) { return new InsideBGTrigger(botAI); }
         static Trigger* player_has_no_flag(PlayerbotAI* botAI) { return new PlayerHasNoFlag(botAI); }
         static Trigger* player_has_flag(PlayerbotAI* botAI) { return new PlayerHasFlag(botAI); }
         static Trigger* team_has_flag(PlayerbotAI* botAI) { return new TeamHasFlag(botAI); }

@@ -166,7 +166,8 @@ PlayerbotAI::PlayerbotAI(Player* bot) : PlayerbotAIBase(true), bot(bot), chatHel
     botOutgoingPacketHandlers.AddHandler(SMSG_EMOTE, "receive emote");
     botOutgoingPacketHandlers.AddHandler(SMSG_LOOT_START_ROLL, "master loot roll");
     botOutgoingPacketHandlers.AddHandler(SMSG_ARENA_TEAM_INVITE, "arena team invite");
-
+    botOutgoingPacketHandlers.AddHandler(SMSG_QUEST_CONFIRM_ACCEPT, "quest confirm accept");
+    
     masterOutgoingPacketHandlers.AddHandler(SMSG_PARTY_COMMAND_RESULT, "party command");
     masterOutgoingPacketHandlers.AddHandler(MSG_RAID_READY_CHECK, "ready check");
     masterOutgoingPacketHandlers.AddHandler(MSG_RAID_READY_CHECK_FINISHED, "ready check finished");
@@ -273,7 +274,6 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
     //     bot->GetMotionMaster()->Clear();
     //     bot->GetMotionMaster()->MoveIdle();
     // }
-
     // cheat options
     if (bot->IsAlive() && ((uint32)GetCheat() > 0 || (uint32)sPlayerbotAIConfig->botCheatMask > 0))
     {
@@ -303,6 +303,15 @@ void PlayerbotAI::UpdateAI(uint32 elapsed, bool minimal)
             return;
     }
 
+    if (!bot->InBattleground() && !bot->inRandomLfgDungeon() && bot->GetGroup()) {
+        Player* leader = bot->GetGroup()->GetLeader();
+        PlayerbotAI* leaderAI = GET_PLAYERBOT_AI(leader);
+        if (leaderAI && !leaderAI->IsRealPlayer()) {
+            bot->RemoveFromGroup();
+            ResetStrategies();
+        }
+    }
+    
     bool min = minimal;
     UpdateAIInternal(elapsed, min);
     inCombat = bot->IsInCombat();
@@ -1327,8 +1336,8 @@ void PlayerbotAI::ResetStrategies(bool load)
     AiFactory::AddDefaultNonCombatStrategies(bot, this, engines[BOT_STATE_NON_COMBAT]);
     AiFactory::AddDefaultDeadStrategies(bot, this, engines[BOT_STATE_DEAD]);
 
-    if (load)
-        sPlayerbotDbStore->Load(this);
+    // if (load)
+    //     sPlayerbotDbStore->Load(this);
 }
 
 bool PlayerbotAI::IsRanged(Player* player)
@@ -1395,6 +1404,19 @@ bool PlayerbotAI::IsRangedDpsAssistantOfIndex(Player* player, int index)
             }
             counter++;
         }
+    }
+    return false;
+}
+
+bool PlayerbotAI::HasAggro(Unit* unit)
+{
+    if (!unit) {
+        return false;
+    }
+    bool isMT = IsMainTank(bot);
+    Unit* victim = unit->GetVictim();
+    if (victim && (victim->GetGUID() == bot->GetGUID() || (!isMT && victim->ToPlayer() && IsTank(victim->ToPlayer())))) {
+        return true;
     }
     return false;
 }
@@ -1969,15 +1991,16 @@ bool PlayerbotAI::HasAura(uint32 spellId, Unit const* unit)
 {
 	if (!spellId || !unit)
 		return false;
+    
+    return unit->HasAura(spellId);
+	// for (uint8 effect = EFFECT_0; effect <= EFFECT_2; effect++)
+	// {
+	// 	AuraEffect const* aurEff = unit->GetAuraEffect(spellId, effect);
+	// 	if (IsRealAura(bot, aurEff, unit))
+	// 		return true;
+	// }
 
-	for (uint8 effect = EFFECT_0; effect <= EFFECT_2; effect++)
-	{
-		AuraEffect const* aurEff = unit->GetAuraEffect(spellId, effect);
-		if (IsRealAura(bot, aurEff, unit))
-			return true;
-	}
-
-	return false;
+	// return false;
 }
 
 Aura* PlayerbotAI::GetAura(std::string const name, Unit* unit, bool checkIsOwner, bool checkDuration, int checkStack)
@@ -2261,8 +2284,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, uint8 effec
     if (sServerFacade->GetDistance2d(bot, goTarget) > sPlayerbotAIConfig->sightDistance)
         return false;
 
-    ObjectGuid oldSel = bot->GetTarget();
-    bot->SetTarget(goTarget->GetGUID());
+    // ObjectGuid oldSel = bot->GetTarget();
+    // bot->SetTarget(goTarget->GetGUID());
     Spell* spell = new Spell(bot, spellInfo, TRIGGERED_NONE);
 
     spell->m_targets.SetGOTarget(goTarget);
@@ -2271,8 +2294,8 @@ bool PlayerbotAI::CanCastSpell(uint32 spellid, GameObject* goTarget, uint8 effec
 
     SpellCastResult result = spell->CheckCast(true);
     delete spell;
-    if (oldSel)
-        bot->SetTarget(oldSel);
+    // if (oldSel)
+    //     bot->SetTarget(oldSel);
 
     switch (result)
     {
@@ -2401,7 +2424,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
         failWithDelay = true;
     }
 
-	ObjectGuid oldSel = bot->GetTarget();
+	ObjectGuid oldSel = bot->GetSelectedUnit() ? bot->GetSelectedUnit()->GetGUID() : ObjectGuid();
 	bot->SetSelection(target->GetGUID());
 
     WorldObject* faceTo = target;
@@ -2526,7 +2549,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, Unit* target, Item* itemTarget)
     aiObjectContext->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 
     if (oldSel)
-        bot->SetTarget(oldSel);
+        bot->SetSelection(oldSel);
 
 
     if (HasStrategy("debug spell", BOT_STATE_NON_COMBAT))
@@ -2584,7 +2607,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
         failWithDelay = true;
     }
 
-    ObjectGuid oldSel = bot->GetTarget();
+    ObjectGuid oldSel = bot->GetSelectedUnit() ? bot->GetSelectedUnit()->GetGUID() : ObjectGuid();
 
     if (!bot->isMoving())
         bot->SetFacingTo(bot->GetAngle(x, y));
@@ -2657,7 +2680,7 @@ bool PlayerbotAI::CastSpell(uint32 spellId, float x, float y, float z, Item* ite
     aiObjectContext->GetValue<PositionMap&>("position")->Get()["random"].Reset();
 
     if (oldSel)
-        bot->SetTarget(oldSel);
+        bot->SetSelection(oldSel);
 
     if (HasStrategy("debug spell", BOT_STATE_NON_COMBAT))
     {
